@@ -1,78 +1,78 @@
 # Wallhaven AutoBG
 
-Cliente multiplataforma (Flutter) para [wallhaven.cc](https://wallhaven.cc): busca wallpapers, descárgalos y **rota tu fondo de escritorio automáticamente** según una búsqueda guardada.
+Cross-platform (Flutter) client for [wallhaven.cc](https://wallhaven.cc): search wallpapers, download them and **rotate your desktop background automatically** based on a saved search.
 
-| Auto | Búsqueda | Ajustes |
+| Auto | Search | Settings |
 | --- | --- | --- |
-| ![Auto](assets/screenshots/auto.png) | ![Búsqueda](assets/screenshots/search.png) | ![Ajustes](assets/screenshots/settings.png) |
+| ![Auto](assets/screenshots/auto.png) | ![Search](assets/screenshots/search.png) | ![Settings](assets/screenshots/settings.png) |
 
-| Galería | Vista de detalle |
+| Gallery | Detail view |
 | --- | --- |
-| ![Galería](assets/screenshots/gallery.png) | ![Detalle](assets/screenshots/detail.png) |
+| ![Gallery](assets/screenshots/gallery.png) | ![Detail](assets/screenshots/detail.png) |
 
-## Características
+## Features
 
-- 🔄 **Rotación automática del fondo** cada N minutos, con cuenta atrás y "Cambiar ahora".
-- 🔍 **Búsqueda guardada** con filtros completos de la API: consulta (soporta `+tag -tag @usuario`), categorías, content rating, resolución mínima, **proporciones** (16x9, 4x3, ...), orden y color dominante.
-- 🖼️ **Galería con scroll infinito** para ver todos los resultados, con vista de detalle (zoom), aplicar como fondo o descargar.
-- 📦 **Descargas en lote** desde la galería (modo selección con progreso).
-- 🧹 **Autolimpieza**: mantiene solo las últimas N descargas (configurable) para no llenar el disco.
-- 📜 **Historial** de cada fondo aplicado, con re-aplicar en un clic y **estadísticas de espacio en disco**.
-- 🔑 **API key opcional** para desbloquear NSFW.
-- 🚀 **Ejecutar al iniciar el sistema** (opcional), minimizado en la bandeja.
-- 🌍 i18n preparado: español e inglés incluidos.
+- 🔄 **Automatic wallpaper rotation** every N minutes, with countdown and a "Change now" button.
+- 🔍 **Saved search** with the full API filters: query (supports `+tag -tag @user`), categories, content rating, minimum resolution, **aspect ratios** (16x9, 4x3, ...), sorting and dominant color.
+- 🖼️ **Infinite-scroll gallery** to browse every result, with a detail view (zoom), set as wallpaper or download.
+- 📦 **Batch downloads** from the gallery (selection mode with live progress).
+- 🧹 **Auto-cleanup**: keeps only the latest N downloads (configurable) so your disk never fills up.
+- 📜 **History** of every applied wallpaper with one-click re-apply and **disk usage stats**.
+- 🔑 **Optional API key** to unlock NSFW content.
+- 🚀 **Run at system startup** (optional), minimized to the system tray.
+- 🌍 i18n ready: Spanish and English included.
 
-## Instalación
+## Installation
 
 ### Windows
-Descarga **`Wallhaven-AutoBG-Setup-<versión>.exe`** de [Releases](../../releases):
+Download **`Wallhaven-AutoBG-Setup-<version>.exe`** from [Releases](../../releases):
 
-1. Doble clic en el instalador (un único .exe)
-2. Se instala solo en `Archivos de programa\Wallhaven AutoBG`
-3. Crea los accesos directos (escritorio + menú Inicio) y queda desinstalable desde Panel de control
+1. Double-click the installer (a single .exe file)
+2. It installs itself into `Program Files\Wallhaven AutoBG`
+3. Creates desktop + Start Menu shortcuts and shows up in Add/Remove Programs
 
-También está disponible el portable (`...windows-portable.zip`) para usarlo sin instalar.
+The portable (`...windows-portable.zip`) is also available if you prefer not to install anything.
 
 ### Ubuntu/Debian
-`wallhaven-autobg_<versión>_amd64.deb` — `sudo dpkg -i wallhaven-autobg_*_amd64.deb` (instala en `/opt/wallhaven-client` con entrada en el menú de aplicaciones).
+`wallhaven-autobg_<version>_amd64.deb` — `sudo dpkg -i wallhaven-autobg_*_amd64.deb` (installs to `/opt/wallhaven-client` with an applications-menu entry).
 
-## Compilar desde cero
+## Building from source
 
-Requiere [Flutter](https://docs.flutter.dev/get-started/install) estable (3.27+).
+Requires [Flutter](https://docs.flutter.dev/get-started/install) stable (3.27+).
 
 ```bash
 flutter pub get
-flutter run -d linux   # o -d windows
-flutter test           # tests unitarios + humo de UI
+flutter run -d linux   # or -d windows
+flutter test           # unit tests + UI smoke test
 ```
 
-Para generar las carpetas de plataforma desde un clon limpio:
+To regenerate platform folders from a clean clone:
 
 ```bash
 flutter create --platforms=windows,linux,android --project-name wallhaven_client .
 ```
 
-## Notas técnicas
+## Technical notes
 
-- **Windows**: el cambio de fondo usa la interfaz COM `IDesktopWallpaper` vía `dart:ffi` (instantáneo, sin reiniciar el shell), con fallback a `SystemParametersInfoW`.
-- **Linux**: `gsettings` (GNOME/Cinnamon/MATE), `plasma-apply-wallpaperimage` (KDE) o `feh` como fallback.
-- La API de Wallhaven está limitada a **45 peticiones/minuto**; la app gestiona el error 429 sin romperse.
-- La autenticación se hace con una [API key](https://wallhaven.cc/settings/account) (la API no soporta login por contraseña).
+- **Windows**: applies wallpapers through the `IDesktopWallpaper` COM interface via `dart:ffi` (instant, no shell restart), with a `SystemParametersInfoW` fallback.
+- **Linux**: `gsettings` (GNOME/Cinnamon/MATE), `plasma-apply-wallpaperimage` (KDE) or `feh` as fallback.
+- Wallhaven's API is limited to **45 requests/minute**; the app handles HTTP 429 gracefully.
+- Authentication uses an [API key](https://wallhaven.cc/settings/account) (the API has no password login).
 
 ## Roadmap
 
-Sigue el progreso en [Issues](../../issues):
+Follow the progress in [Issues](../../issues):
 
-- [ ] Android: plugin nativo para aplicar fondos (`WallpaperManager`) — [#1](../../issues/1)
-- [ ] Colecciones de usuario como fuente de la rotación — [#2](../../issues/2)
-- [ ] Arranque minimizado en la bandeja (`--hidden`) — [#3](../../issues/3)
-- [ ] Filtros extra: resolución exacta y all-wide/all-portrait — [#4](../../issues/4)
-- [ ] Descargas en lote desde la galería — [#5](../../issues/5)
-- [ ] Instaladores MSIX (Windows) y Flatpak/Snap (Linux) — [#6](../../issues/6)
-- [ ] Más idiomas (portugués, francés, alemán...) — [#7](../../issues/7)
-- [ ] Hotkey global para "Cambiar ahora" — [#8](../../issues/8)
-- [ ] Estadísticas de descargas y limpieza de historial — [#9](../../issues/9)
+- [x] System tray (minimize to tray, start hidden) — #3, done in v0.4.1
+- [x] Batch downloads from the gallery — #5, done in v0.4.0
+- [x] Download stats & history cleanup — #9, done in v0.4.0
+- [ ] Android: native wallpaper plugin (`WallpaperManager`) — #1
+- [ ] User collections as rotation source — #2
+- [ ] Extra filters: exact resolutions and all-wide/all-portrait — #4
+- [ ] MSIX (Windows) / Flatpak-Snap (Linux) installers — #6
+- [ ] More translations (Portuguese, French, German...) — #7
+- [ ] Global hotkey for "Change now" — #8
 
-## Licencia
+## License
 
-MIT. Todas las imágenes pertenecen a sus autores originales (wallhaven.cc).
+MIT. All images belong to their original owners (wallhaven.cc).
