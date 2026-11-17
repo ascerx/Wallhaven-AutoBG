@@ -43,4 +43,4 @@ Name: "desktopicon"; Description: "Crear acceso directo en el escritorio"; Group
 Filename: "{app}\wallhaven_client.exe"; Description: "Ejecutar Wallhaven AutoBG"; Flags: postinstall nowait skipifsilent
 
 [UninstallRun]
-Filename: "reg"; Params: "delete HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v ""Wallhaven Client"" /f"; Flags: runhidden
+Filename: "reg"; Parameters: "delete HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v ""Wallhaven Client"" /f"; Flags: runhidden
