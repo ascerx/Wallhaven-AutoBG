@@ -28,7 +28,8 @@ bool FlutterWindow::OnCreate() {
   SetChildContent(flutter_controller_->view()->GetNativeWindow());
 
   flutter_controller_->engine()->SetNextFrameCallback([&]() {
-    this->Show();
+    // Intentionally not showing the window here: window_manager controls
+    // visibility so the app can start hidden in the system tray.
   });
 
   // Flutter can complete the first frame before the "show window" callback is

@@ -40,7 +40,7 @@ class StartupService {
           '/t',
           'REG_SZ',
           '/d',
-          '"$exe"',
+          '"$exe" --hidden',
           '/f',
         ]);
         if (result.exitCode != 0) {
@@ -66,7 +66,7 @@ class StartupService {
           '[Desktop Entry]\n'
           'Type=Application\n'
           'Name=$_appName\n'
-          'Exec=$exe\n'
+          'Exec=$exe --hidden\n'
           'X-GNOME-Autostart-enabled=true\n',
         );
       } else if (await file.exists()) {

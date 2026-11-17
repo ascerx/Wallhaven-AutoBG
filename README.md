@@ -19,7 +19,7 @@ Cliente multiplataforma (Flutter) para [wallhaven.cc](https://wallhaven.cc): bus
 - 🧹 **Autolimpieza**: mantiene solo las últimas N descargas (configurable) para no llenar el disco.
 - 📜 **Historial** de cada fondo aplicado, con re-aplicar en un clic y **estadísticas de espacio en disco**.
 - 🔑 **API key opcional** para desbloquear NSFW.
-- 🚀 **Ejecutar al iniciar el sistema** (opcional).
+- 🚀 **Ejecutar al iniciar el sistema** (opcional), minimizado en la bandeja.
 - 🌍 i18n preparado: español e inglés incluidos.
 
 ## Instalación

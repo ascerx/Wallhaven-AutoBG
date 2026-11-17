@@ -46,6 +46,12 @@ class _WallhavenAppState extends State<WallhavenApp> with WindowListener {
     }
   }
 
+  @override
+  void onWindowFocus() {
+    // Required when starting hidden: repaint once the window is focused.
+    if (mounted) setState(() {});
+  }
+
   Future<void> _setupTray() async {
     try {
       final tray = SystemTray();

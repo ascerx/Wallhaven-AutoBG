@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'app.dart';
+import 'utils/app_args.dart';
 import 'services/auto_changer.dart';
 import 'services/downloader.dart';
 import 'services/history_repository.dart';
@@ -16,9 +17,19 @@ import 'state/app_state.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Window management (hide to tray instead of closing).
+  // Window management: hide to tray on close, and optionally start hidden
+  // in the tray (used by the "run at startup" entry via `--hidden`).
+  final startHidden = shouldStartHidden();
   await windowManager.ensureInitialized();
-  await windowManager.setTitle('Wallhaven Client');
+  await windowManager.waitUntilReadyToShow(
+    const WindowOptions(title: 'Wallhaven Client'),
+    () async {
+      if (!startHidden) {
+        await windowManager.show();
+        await windowManager.focus();
+      }
+    },
+  );
 
   final prefs = await SharedPreferences.getInstance();
 
