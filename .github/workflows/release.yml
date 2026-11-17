@@ -20,6 +20,12 @@ jobs:
       - run: flutter pub get
       - run: flutter test
       - run: flutter build windows --release
+      - name: Bundle VC++ runtime DLLs (portable without redistributable)
+        shell: pwsh
+        run: |
+          foreach ($dll in @('msvcp140.dll', 'vcruntime140.dll', 'vcruntime140_1.dll')) {
+            Copy-Item "C:\Windows\System32\$dll" 'build/windows/x64/runner/Release/' -ErrorAction SilentlyContinue
+          }
       - name: Zip portable build
         shell: pwsh
         run: Compress-Archive -Path 'build/windows/x64/runner/Release/*' -DestinationPath 'wallhaven-autobg-windows-portable.zip'

@@ -19,17 +19,23 @@ Future<void> main() async {
 
   // Window management: hide to tray on close, and optionally start hidden
   // in the tray (used by the "run at startup" entry via `--hidden`).
+  // Wrapped so a broken plugin (e.g. missing VC++ runtime on the target
+  // machine) can't stop the app from starting.
   final startHidden = shouldStartHidden();
-  await windowManager.ensureInitialized();
-  await windowManager.waitUntilReadyToShow(
-    const WindowOptions(title: 'Wallhaven Client'),
-    () async {
-      if (!startHidden) {
-        await windowManager.show();
-        await windowManager.focus();
-      }
-    },
-  );
+  try {
+    await windowManager.ensureInitialized();
+    await windowManager.waitUntilReadyToShow(
+      const WindowOptions(title: 'Wallhaven Client'),
+      () async {
+        if (!startHidden) {
+          await windowManager.show();
+          await windowManager.focus();
+        }
+      },
+    );
+  } on Exception {
+    // Run as a plain window without window_manager.
+  }
 
   final prefs = await SharedPreferences.getInstance();
 

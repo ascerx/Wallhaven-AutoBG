@@ -39,10 +39,14 @@ class _WallhavenAppState extends State<WallhavenApp> with WindowListener {
   /// some Linux setups) the window closes normally.
   @override
   void onWindowClose() async {
-    if (_trayReady) {
-      await windowManager.hide();
-    } else {
-      await windowManager.destroy();
+    try {
+      if (_trayReady) {
+        await windowManager.hide();
+      } else {
+        await windowManager.destroy();
+      }
+    } on Exception {
+      // window_manager unavailable: let the OS close the window.
     }
   }
 
