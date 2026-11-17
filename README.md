@@ -24,10 +24,17 @@ Cliente multiplataforma (Flutter) para [wallhaven.cc](https://wallhaven.cc): bus
 
 ## Instalación
 
-Descarga el binario para tu plataforma en [Releases](../../releases):
+### Windows
+Descarga **`Wallhaven-AutoBG-Setup-<versión>.exe`** de [Releases](../../releases):
 
-- **Windows**: `wallhaven-autobg-windows-portable.zip` — descomprime y ejecuta `wallhaven_client.exe` (no requiere instalación).
-- **Ubuntu/Debian**: `wallhaven-autobg_*_amd64.deb` — `sudo dpkg -i wallhaven-autobg_*_amd64.deb` (instala en `/opt/wallhaven-client` con entrada en el menú de aplicaciones).
+1. Doble clic en el instalador (un único .exe)
+2. Se instala solo en `Archivos de programa\Wallhaven AutoBG`
+3. Crea los accesos directos (escritorio + menú Inicio) y queda desinstalable desde Panel de control
+
+También está disponible el portable (`...windows-portable.zip`) para usarlo sin instalar.
+
+### Ubuntu/Debian
+`wallhaven-autobg_<versión>_amd64.deb` — `sudo dpkg -i wallhaven-autobg_*_amd64.deb` (instala en `/opt/wallhaven-client` con entrada en el menú de aplicaciones).
 
 ## Compilar desde cero
 

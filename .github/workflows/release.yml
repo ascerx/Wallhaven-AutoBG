@@ -26,18 +26,28 @@ jobs:
           foreach ($dll in @('msvcp140.dll', 'vcruntime140.dll', 'vcruntime140_1.dll')) {
             Copy-Item "C:\Windows\System32\$dll" 'build/windows/x64/runner/Release/' -ErrorAction SilentlyContinue
           }
+      - name: Build single-exe installer (Inno Setup)
+        shell: pwsh
+        run: |
+          $version = (Select-String -Path 'pubspec.yaml' -Pattern '^version:\s*(\S+)').Matches[0].Groups[1].Value
+          choco install innosetup -y --no-progress | Out-Null
+          & 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' "/DAppVersion=$version" 'packaging/installer.iss'
       - name: Zip portable build
         shell: pwsh
         run: Compress-Archive -Path 'build/windows/x64/runner/Release/*' -DestinationPath 'wallhaven-autobg-windows-portable.zip'
       - uses: actions/upload-artifact@v4
         with:
-          name: windows-portable
-          path: wallhaven-autobg-windows-portable.zip
+          name: windows-installer
+          path: |
+            packaging/installer/Wallhaven-AutoBG-Setup-*.exe
+            wallhaven-autobg-windows-portable.zip
       - name: Attach to release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: wallhaven-autobg-windows-portable.zip
+          files: |
+            packaging/installer/Wallhaven-AutoBG-Setup-*.exe
+            wallhaven-autobg-windows-portable.zip
 
   build-linux:
     runs-on: ubuntu-latest

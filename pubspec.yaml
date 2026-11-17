@@ -2,7 +2,7 @@ name: wallhaven_client
 description: A cross-platform Wallhaven client - search wallpapers, download them
   locally and rotate your desktop background automatically.
 publish_to: none
-version: 0.4.3
+version: 0.5.0
 
 environment:
   sdk: ^3.6.0
