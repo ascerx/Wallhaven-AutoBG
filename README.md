@@ -73,6 +73,20 @@ Follow the progress in [Issues](../../issues):
 - [ ] More translations (Portuguese, French, German...) — #7
 - [ ] Global hotkey for "Change now" — #8
 
+## Troubleshooting (Windows)
+
+**"This program is blocked by group policy"** when running the downloaded installer on a stock Windows — that's the Mark-of-the-Web block applied to unsigned downloaded executables. Fixes (any of them):
+
+```powershell
+Unblock-File -Path "C:\path\to\Wallhaven-AutoBG-Setup-<version>.exe"
+```
+
+- or right-click the .exe → Properties → check **Unblock** → OK
+- don't run the .exe from inside the ZIP preview; extract first
+- as a last resort, install [the VC++ redistributable](https://aka.ms/vs/17/release/vc_redist.x64.exe) and use the portable zip
+
+Long-term fix (planned in #6): code-signing the installer removes SmartScreen entirely.
+
 ## License
 
 MIT. All images belong to their original owners (wallhaven.cc).
