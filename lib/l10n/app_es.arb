@@ -77,6 +77,21 @@
   "autoCleanupKeep": "Mantener las últimas {count}",
   "@autoCleanupKeep": { "placeholders": { "count": { "type": "int" } } },
   "autoCleanupUnlimited": "Sin límite",
+  "selectionMode": "Seleccionar",
+  "cancelSelection": "Cancelar",
+  "downloadSelected": "Descargar {count}",
+  "@downloadSelected": { "placeholders": { "count": { "type": "int" } } },
+  "selectedCount": "{count} seleccionadas",
+  "@selectedCount": { "placeholders": { "count": { "type": "int" } } },
+  "batchProgress": "Descargando {done}/{total}…",
+  "@batchProgress": {
+    "placeholders": {
+      "done": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "batchDone": "{count} descargadas",
+  "@batchDone": { "placeholders": { "count": { "type": "int" } } },
   "startupLabel": "Ejecutar al iniciar el sistema",
   "languageLabel": "Idioma",
   "languageSystem": "Predeterminado del sistema",
@@ -86,6 +101,14 @@
   "openInBrowser": "Abrir en el navegador",
   "uploadedBy": "Subido por {name}",
   "@uploadedBy": { "placeholders": { "name": { "type": "String" } } },
+  "totalDiskUsage": "{size} en disco",
+  "@totalDiskUsage": { "placeholders": { "size": { "type": "String" } } },
+  "downloadsCount": "{count} descargas",
+  "@downloadsCount": { "placeholders": { "count": { "type": "int" } } },
+  "clearHistory": "Borrar historial",
+  "deleteFile": "Eliminar archivo",
+  "fileDeleted": "Archivo eliminado",
+  "historyCleared": "Historial borrado",
 
   "historySectionTitle": "Historial y descargas",
   "openFolderButton": "Abrir carpeta",

@@ -500,6 +500,42 @@ abstract class AppLocalizations {
   /// **'Unlimited'**
   String get autoCleanupUnlimited;
 
+  /// No description provided for @selectionMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Select'**
+  String get selectionMode;
+
+  /// No description provided for @cancelSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancelSelection;
+
+  /// No description provided for @downloadSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Download {count}'**
+  String downloadSelected(int count);
+
+  /// No description provided for @selectedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} selected'**
+  String selectedCount(int count);
+
+  /// No description provided for @batchProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading {done}/{total}…'**
+  String batchProgress(int done, int total);
+
+  /// No description provided for @batchDone.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} downloaded'**
+  String batchDone(int count);
+
   /// No description provided for @startupLabel.
   ///
   /// In en, this message translates to:
@@ -547,6 +583,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Uploaded by {name}'**
   String uploadedBy(String name);
+
+  /// No description provided for @totalDiskUsage.
+  ///
+  /// In en, this message translates to:
+  /// **'{size} on disk'**
+  String totalDiskUsage(String size);
+
+  /// No description provided for @downloadsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} downloads'**
+  String downloadsCount(int count);
+
+  /// No description provided for @clearHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear history'**
+  String get clearHistory;
+
+  /// No description provided for @deleteFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete file'**
+  String get deleteFile;
+
+  /// No description provided for @fileDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'File deleted'**
+  String get fileDeleted;
+
+  /// No description provided for @historyCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'History cleared'**
+  String get historyCleared;
 
   /// No description provided for @historySectionTitle.
   ///

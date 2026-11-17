@@ -6,10 +6,12 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wallhaven_client/l10n/generated/app_localizations.dart';
 
+import '../../models/history_entry.dart';
 import '../../models/search_options.dart';
 import '../../models/wallpaper.dart';
 import '../../services/auto_changer.dart';
 import '../../services/downloader.dart';
+import '../../services/history_repository.dart';
 import '../../services/wallhaven_api.dart';
 import '../../state/app_state.dart';
 
@@ -28,10 +30,15 @@ class _GalleryScreenState extends State<GalleryScreen> {
   final List<Wallpaper> _items = [];
   final ScrollController _scroll = ScrollController();
   final Random _rng = Random();
+  final Set<int> _selectedIndexes = {};
 
   int _page = 0;
   bool _loading = false;
   bool _hasMore = true;
+  bool _selecting = false;
+  bool _batchDownloading = false;
+  int _batchDone = 0;
+  int _batchTotal = 0;
   String? _seed;
 
   @override
@@ -91,6 +98,60 @@ class _GalleryScreenState extends State<GalleryScreen> {
     }
   }
 
+  Future<void> _downloadSelected() async {
+    if (_batchDownloading || _selectedIndexes.isEmpty) return;
+    setState(() => _batchDownloading = true);
+    final l = AppLocalizations.of(context)!;
+    final downloader = context.read<WallpaperDownloader>();
+    final state = context.read<AppState>();
+    final history = context.read<HistoryRepository>();
+    final changer = context.read<AutoChanger>();
+
+    var ok = 0;
+    final total = _selectedIndexes.length;
+    var done = 0;
+    if (mounted) {
+      setState(() {
+        _batchDone = 0;
+        _batchTotal = total;
+      });
+    }
+    for (final index in _selectedIndexes.toList()) {
+      final wallpaper = _items[index];
+      try {
+        final file = await downloader.downloadWallpaper(
+          wallpaper,
+          Directory(state.downloadDir),
+        );
+        await history.add(HistoryEntry(
+          id: wallpaper.id,
+          fileUrl: wallpaper.fileUrl,
+          thumbUrl: wallpaper.thumbs.large,
+          resolution: wallpaper.resolution,
+          filePath: file.path,
+          appliedAt: DateTime.now(),
+        ));
+        ok++;
+      } on Exception {
+        // Skip failed downloads and keep going.
+      }
+      done++;
+      if (mounted) setState(() => _batchDone = done);
+    }
+    await changer.pruneDownloads();
+
+    if (!mounted) return;
+    setState(() {
+      _batchDownloading = false;
+      _selecting = false;
+      _selectedIndexes.clear();
+      _batchDone = 0;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(l.batchDone(ok))),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
@@ -102,58 +163,140 @@ class _GalleryScreenState extends State<GalleryScreen> {
               : '${l.galleryTitle} · ${widget.options.query}',
           overflow: TextOverflow.ellipsis,
         ),
+        actions: [
+          IconButton(
+            tooltip: _selecting ? l.cancelSelection : l.selectionMode,
+            icon: Icon(_selecting ? Icons.close : Icons.checklist_rtl),
+            onPressed: () => setState(() {
+              _selecting = !_selecting;
+              _selectedIndexes.clear();
+            }),
+          ),
+        ],
       ),
-      body: _items.isEmpty && _loading
-          ? const Center(child: CircularProgressIndicator())
-          : _items.isEmpty
-              ? Center(child: Text(l.testNoResults))
-              : LayoutBuilder(
-                  builder: (context, constraints) {
-                    final cross =
-                        (constraints.maxWidth / 250).floor().clamp(2, 6);
-                    return GridView.builder(
-                      controller: _scroll,
-                      padding: const EdgeInsets.all(10),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: cross,
-                        crossAxisSpacing: 8,
-                        mainAxisSpacing: 8,
-                        childAspectRatio: 16 / 10,
+      body: Column(
+        children: [
+          Expanded(
+            child: _items.isEmpty && _loading
+                ? const Center(child: CircularProgressIndicator())
+                : _items.isEmpty
+                    ? Center(child: Text(l.testNoResults))
+                    : LayoutBuilder(
+                        builder: (context, constraints) {
+                          final cross =
+                              (constraints.maxWidth / 250).floor().clamp(2, 6);
+                          return GridView.builder(
+                            controller: _scroll,
+                            padding: const EdgeInsets.all(10),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: cross,
+                              crossAxisSpacing: 8,
+                              mainAxisSpacing: 8,
+                              childAspectRatio: 16 / 10,
+                            ),
+                            itemCount:
+                                _items.length + (_hasMore || _loading ? 1 : 0),
+                            itemBuilder: (context, index) {
+                              if (index >= _items.length) {
+                                return _hasMore
+                                    ? const Center(
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : Center(child: Text(l.noMoreResults));
+                              }
+                              return _GalleryTile(
+                                wallpaper: _items[index],
+                                selecting: _selecting,
+                                selected: _selectedIndexes.contains(index),
+                                onToggle: _selecting
+                                    ? () => setState(() {
+                                          _selectedIndexes.contains(index)
+                                              ? _selectedIndexes.remove(index)
+                                              : _selectedIndexes.add(index);
+                                        })
+                                    : null,
+                              );
+                            },
+                          );
+                        },
                       ),
-                      itemCount: _items.length + (_hasMore || _loading ? 1 : 0),
-                      itemBuilder: (context, index) {
-                        if (index >= _items.length) {
-                          return _hasMore
-                              ? const Center(
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : Center(child: Text(l.noMoreResults));
-                        }
-                        return _GalleryTile(
-                          wallpaper: _items[index],
-                        );
-                      },
-                    );
-                  },
+          ),
+          if (_selecting)
+            SafeArea(
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainerLow,
+                  border: Border(
+                    top: BorderSide(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .outlineVariant
+                          .withValues(alpha: 0.5),
+                    ),
+                  ),
                 ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _batchDownloading
+                            ? l.batchProgress(_batchDone, _batchTotal)
+                            : l.selectedCount(_selectedIndexes.length),
+                      ),
+                    ),
+                    FilledButton.icon(
+                      onPressed: (_batchDownloading ||
+                              _selectedIndexes.isEmpty)
+                          ? null
+                          : () => _downloadSelected(),
+                      icon: _batchDownloading
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child:
+                                  CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.download),
+                      label: Text(_batchDownloading
+                          ? '...'
+                          : l.downloadSelected(_selectedIndexes.length)),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
 
 class _GalleryTile extends StatelessWidget {
-  const _GalleryTile({required this.wallpaper});
+  const _GalleryTile({
+    required this.wallpaper,
+    this.selecting = false,
+    this.selected = false,
+    this.onToggle,
+  });
 
   final Wallpaper wallpaper;
+  final bool selecting;
+  final bool selected;
+  final VoidCallback? onToggle;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(10),
-      onTap: () => Navigator.of(context).push(MaterialPageRoute(
-        builder: (_) => _GalleryDetail(wallpaper: wallpaper),
-      )),
+      onTap: selecting && onToggle != null
+          ? onToggle
+          : () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => _GalleryDetail(wallpaper: wallpaper),
+              )),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
         child: Stack(
@@ -187,6 +330,27 @@ class _GalleryTile extends StatelessWidget {
                 ),
               ),
             ),
+            if (selecting)
+              Positioned(
+                top: 6,
+                right: 6,
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: selected
+                        ? Theme.of(context).colorScheme.primary
+                        : Colors.black45,
+                  ),
+                  padding: const EdgeInsets.all(4),
+                  child: Icon(
+                    selected ? Icons.check : Icons.circle_outlined,
+                    size: 18,
+                    color: selected
+                        ? Theme.of(context).colorScheme.onPrimary
+                        : Colors.white,
+                  ),
+                ),
+              ),
           ],
         ),
       ),

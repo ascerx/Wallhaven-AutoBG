@@ -173,6 +173,9 @@ class AutoChanger extends ChangeNotifier {
     }
   }
 
+  /// Public so the gallery can prune after batch downloads.
+  Future<void> pruneDownloads() => _prune();
+
   Future<void> _run() async {
     try {
       final options = _getOptions();

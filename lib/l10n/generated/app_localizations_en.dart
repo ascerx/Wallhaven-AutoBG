@@ -222,6 +222,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get autoCleanupUnlimited => 'Unlimited';
 
   @override
+  String get selectionMode => 'Select';
+
+  @override
+  String get cancelSelection => 'Cancel';
+
+  @override
+  String downloadSelected(int count) {
+    return 'Download $count';
+  }
+
+  @override
+  String selectedCount(int count) {
+    return '$count selected';
+  }
+
+  @override
+  String batchProgress(int done, int total) {
+    return 'Downloading $done/$total…';
+  }
+
+  @override
+  String batchDone(int count) {
+    return '$count downloaded';
+  }
+
+  @override
   String get startupLabel => 'Run at system startup';
 
   @override
@@ -246,6 +272,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String uploadedBy(String name) {
     return 'Uploaded by $name';
   }
+
+  @override
+  String totalDiskUsage(String size) {
+    return '$size on disk';
+  }
+
+  @override
+  String downloadsCount(int count) {
+    return '$count downloads';
+  }
+
+  @override
+  String get clearHistory => 'Clear history';
+
+  @override
+  String get deleteFile => 'Delete file';
+
+  @override
+  String get fileDeleted => 'File deleted';
+
+  @override
+  String get historyCleared => 'History cleared';
 
   @override
   String get historySectionTitle => 'History & downloads';

@@ -6,13 +6,18 @@ Cliente multiplataforma (Flutter) para [wallhaven.cc](https://wallhaven.cc): bus
 | --- | --- | --- |
 | ![Auto](assets/screenshots/auto.png) | ![Búsqueda](assets/screenshots/search.png) | ![Ajustes](assets/screenshots/settings.png) |
 
+| Galería | Vista de detalle |
+| --- | --- |
+| ![Galería](assets/screenshots/gallery.png) | ![Detalle](assets/screenshots/detail.png) |
+
 ## Características
 
 - 🔄 **Rotación automática del fondo** cada N minutos, con cuenta atrás y "Cambiar ahora".
 - 🔍 **Búsqueda guardada** con filtros completos de la API: consulta (soporta `+tag -tag @usuario`), categorías, content rating, resolución mínima, **proporciones** (16x9, 4x3, ...), orden y color dominante.
 - 🖼️ **Galería con scroll infinito** para ver todos los resultados, con vista de detalle (zoom), aplicar como fondo o descargar.
+- 📦 **Descargas en lote** desde la galería (modo selección con progreso).
 - 🧹 **Autolimpieza**: mantiene solo las últimas N descargas (configurable) para no llenar el disco.
-- 📜 **Historial** de cada fondo aplicado, con re-aplicar en un clic.
+- 📜 **Historial** de cada fondo aplicado, con re-aplicar en un clic y **estadísticas de espacio en disco**.
 - 🔑 **API key opcional** para desbloquear NSFW.
 - 🚀 **Ejecutar al iniciar el sistema** (opcional).
 - 🌍 i18n preparado: español e inglés incluidos.

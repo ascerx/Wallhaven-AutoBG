@@ -8,15 +8,7 @@ Future<int> pruneDownloadFolder(String dirPath, int keepCount) async {
   final dir = Directory(dirPath);
   if (!await dir.exists()) return 0;
 
-  final files = <File>[];
-  await for (final entity in dir.list()) {
-    if (entity is! File) continue;
-    final name = entity.path.split(Platform.pathSeparator).last.toLowerCase();
-    if (name.startsWith('wallhaven-') &&
-        (name.endsWith('.jpg') || name.endsWith('.png'))) {
-      files.add(entity);
-    }
-  }
+  final files = await listDownloadedWallpapers(dir);
   if (files.length <= keepCount) return 0;
 
   files.sort(
@@ -33,4 +25,33 @@ Future<int> pruneDownloadFolder(String dirPath, int keepCount) async {
     }
   }
   return deleted;
+}
+
+/// Total size in bytes of every downloaded wallpaper in [dirPath].
+Future<int> downloadFolderSize(String dirPath) async {
+  final dir = Directory(dirPath);
+  if (!await dir.exists()) return 0;
+  final files = await listDownloadedWallpapers(dir);
+  var total = 0;
+  for (final file in files) {
+    try {
+      total += await file.length();
+    } on FileSystemException {
+      // Skip unreadable files.
+    }
+  }
+  return total;
+}
+
+Future<List<File>> listDownloadedWallpapers(Directory dir) async {
+  final files = <File>[];
+  await for (final entity in dir.list()) {
+    if (entity is! File) continue;
+    final name = entity.path.split(Platform.pathSeparator).last.toLowerCase();
+    if (name.startsWith('wallhaven-') &&
+        (name.endsWith('.jpg') || name.endsWith('.png'))) {
+      files.add(entity);
+    }
+  }
+  return files;
 }

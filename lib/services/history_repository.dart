@@ -45,6 +45,15 @@ class HistoryRepository extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Removes a single entry (does not delete the file on disk).
+  Future<void> remove(HistoryEntry entry) async {
+    _entries.removeWhere(
+      (e) => e.id == entry.id && e.filePath == entry.filePath,
+    );
+    await _persist();
+    notifyListeners();
+  }
+
   Future<void> clear() async {
     _entries.clear();
     await _persist();
