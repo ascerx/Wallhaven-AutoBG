@@ -1,0 +1,43 @@
+name: wallhaven_client
+description: A cross-platform Wallhaven client - search wallpapers, download them
+  locally and rotate your desktop background automatically.
+publish_to: none
+version: 0.2.0
+
+environment:
+  sdk: ^3.6.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+
+  # Official Material library (flutter/material.dart is deprecated since 3.47)
+  material_ui: ^1.11.1
+  cupertino_ui: ^1.1.7
+
+  # Networking
+  http: ^1.2.2
+
+  # State management & persistence
+  provider: ^6.1.2
+  shared_preferences: ^2.3.4
+  path_provider: ^2.1.5
+
+  # Desktop folder picker
+  file_selector: ^1.0.3
+
+  # Used by the Windows wallpaper setter (dart:ffi helpers)
+  ffi: ^2.1.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  path_provider_platform_interface: ^2.1.2
+
+flutter:
+  uses-material-design: true
+  generate: true

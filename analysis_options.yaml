@@ -1,0 +1,10 @@
+analyzer:
+  exclude:
+    - build/**
+    - android/**
+    - windows/**
+    - linux/**
+    # Tool-generated localizations (flutter gen-l10n); the generator still
+    # imports flutter_localizations, which triggers deprecation infos.
+    - lib/l10n/generated/**
+include: package:flutter_lints/flutter.yaml

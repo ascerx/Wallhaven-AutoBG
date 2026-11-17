@@ -1,0 +1,94 @@
+name: Build and release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.50.0'
+          channel: stable
+      - run: flutter pub get
+      - run: flutter test
+      - run: flutter build windows --release
+      - name: Zip portable build
+        shell: pwsh
+        run: Compress-Archive -Path 'build/windows/x64/runner/Release/*' -DestinationPath 'wallhaven-autobg-windows-portable.zip'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-portable
+          path: wallhaven-autobg-windows-portable.zip
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: wallhaven-autobg-windows-portable.zip
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.50.0'
+          channel: stable
+      - run: sudo apt-get update -y
+      - run: sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev
+      - run: flutter pub get
+      - run: flutter test
+      - run: flutter build linux --release
+      - name: Package .deb
+        run: |
+          VER=$(grep '^version:' pubspec.yaml | sed 's/version: //;s/+.*//')
+          mkdir -p pkg/DEBIAN pkg/opt/wallhaven-client pkg/usr/share/applications
+          cp -r build/linux/x64/release/bundle/* pkg/opt/wallhaven-client/
+          cp assets/icon.png pkg/opt/wallhaven-client/icon.png
+          cat > pkg/usr/share/applications/wallhaven-autobg.desktop <<'EOF'
+          [Desktop Entry]
+          Name=Wallhaven AutoBG
+          Comment=Rotación automática de fondos con wallhaven.cc
+          Exec=/opt/wallhaven-client/wallhaven_client
+          Icon=/opt/wallhaven-client/icon.png
+          Type=Application
+          Categories=Graphics;
+          EOF
+          cat > pkg/DEBIAN/control <<'EOF'
+          Package: wallhaven-autobg
+          Section: graphics
+          Priority: optional
+          Architecture: amd64
+          Maintainer: ascerx
+          Depends: libgtk-3-0, libglib2.0-0, libstdc++6
+          Description: Cliente de Wallhaven con rotación automática de fondos
+           Busca wallpapers en wallhaven.cc, los descarga y cambia tu fondo de
+           escritorio automáticamente.
+          EOF
+          sed -i "s/^Version:.*/Version: ${VER}/" pkg/DEBIAN/control
+          echo "Package: wallhaven-autobg" > pkg/DEBIAN/control
+          echo "Version: ${VER}" >> pkg/DEBIAN/control
+          echo "Section: graphics" >> pkg/DEBIAN/control
+          echo "Priority: optional" >> pkg/DEBIAN/control
+          echo "Architecture: amd64" >> pkg/DEBIAN/control
+          echo "Maintainer: ascerx" >> pkg/DEBIAN/control
+          echo "Depends: libgtk-3-0, libglib2.0-0, libstdc++6" >> pkg/DEBIAN/control
+          echo "Description: Cliente de Wallhaven con rotación automática de fondos" >> pkg/DEBIAN/control
+          echo " Busca wallpapers en wallhaven.cc, los descarga y cambia tu fondo de escritorio automáticamente." >> pkg/DEBIAN/control
+          dpkg-deb --build --root-owner-group pkg wallhaven-autobg_${VER}_amd64.deb
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-deb
+          path: wallhaven-autobg_*_amd64.deb
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: wallhaven-autobg_*_amd64.deb
