@@ -49,9 +49,17 @@ flutter create --platforms=windows,linux,android --project-name wallhaven_client
 
 ## Roadmap
 
-- [ ] Android: plugin nativo para aplicar fondos (`WallpaperManager`).
-- [ ] Colecciones de usuario como fuente de la rotación.
-- [ ] Bandeja del sistema (tray) para minimizar al segundo plano.
+Sigue el progreso en [Issues](../../issues):
+
+- [ ] Android: plugin nativo para aplicar fondos (`WallpaperManager`) — [#1](../../issues/1)
+- [ ] Colecciones de usuario como fuente de la rotación — [#2](../../issues/2)
+- [ ] Arranque minimizado en la bandeja (`--hidden`) — [#3](../../issues/3)
+- [ ] Filtros extra: resolución exacta y all-wide/all-portrait — [#4](../../issues/4)
+- [ ] Descargas en lote desde la galería — [#5](../../issues/5)
+- [ ] Instaladores MSIX (Windows) y Flatpak/Snap (Linux) — [#6](../../issues/6)
+- [ ] Más idiomas (portugués, francés, alemán...) — [#7](../../issues/7)
+- [ ] Hotkey global para "Cambiar ahora" — [#8](../../issues/8)
+- [ ] Estadísticas de descargas y limpieza de historial — [#9](../../issues/9)
 
 ## Licencia
 
