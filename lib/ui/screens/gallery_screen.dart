@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:wallhaven_client/l10n/generated/app_localizations.dart';
 
 import '../../models/search_options.dart';
@@ -193,10 +194,23 @@ class _GalleryTile extends StatelessWidget {
   }
 }
 
-class _GalleryDetail extends StatelessWidget {
+class _GalleryDetail extends StatefulWidget {
   const _GalleryDetail({required this.wallpaper});
 
   final Wallpaper wallpaper;
+
+  @override
+  State<_GalleryDetail> createState() => _GalleryDetailState();
+}
+
+class _GalleryDetailState extends State<_GalleryDetail> {
+  late final Future<Wallpaper> _info;
+
+  @override
+  void initState() {
+    super.initState();
+    _info = context.read<WallhavenApi>().wallpaperInfo(widget.wallpaper.id);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -208,7 +222,7 @@ class _GalleryDetail extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
-        title: Text('${wallpaper.id} · ${wallpaper.resolution}'),
+        title: Text('${widget.wallpaper.id} · ${widget.wallpaper.resolution}'),
       ),
       body: Column(
         children: [
@@ -217,7 +231,7 @@ class _GalleryDetail extends StatelessWidget {
               maxScale: 4,
               child: Center(
                 child: Image.network(
-                  wallpaper.thumbs.original,
+                  widget.wallpaper.thumbs.original,
                   fit: BoxFit.contain,
                   errorBuilder: (_, __, ___) => const Center(
                     child: Icon(
@@ -237,15 +251,71 @@ class _GalleryDetail extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  // Tags, uploader and page link (full info endpoint).
+                  FutureBuilder<Wallpaper>(
+                    future: _info,
+                    builder: (context, snapshot) {
+                      final info = snapshot.data;
+                      if (info == null) return const SizedBox.shrink();
+                      final tags = (info.uploaderUsername == null &&
+                              info.tagNames.isEmpty)
+                          ? const SizedBox.shrink()
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (info.tagNames.isNotEmpty) ...[
+                                  Text(
+                                    l.tagsLabel,
+                                    style: const TextStyle(
+                                        color: Colors.white70, fontSize: 12),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Wrap(
+                                    spacing: 6,
+                                    runSpacing: 4,
+                                    children: [
+                                      for (final tag in info.tagNames)
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8, vertical: 3),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white12,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          ),
+                                          child: Text(
+                                            tag,
+                                            style: const TextStyle(
+                                                color: Colors.white70,
+                                                fontSize: 11),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 6),
+                                ],
+                                if (info.uploaderUsername != null)
+                                  Text(
+                                    l.uploadedBy(info.uploaderUsername!),
+                                    style: const TextStyle(
+                                        color: Colors.white54, fontSize: 12),
+                                  ),
+                              ],
+                            );
+                      return tags;
+                    },
+                  ),
+                  const SizedBox(height: 8),
                   FilledButton.icon(
                     onPressed: () async {
-                      final ok = await changer.applyWallpaper(wallpaper);
+                      final ok = await changer.applyWallpaper(widget.wallpaper);
                       if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
                             ok
-                                ? l.wallpaperSet(wallpaper.id)
+                                ? l.wallpaperSet(widget.wallpaper.id)
                                 : l.wallpaperSetFailed(
                                     changer.lastError ?? ''),
                           ),
@@ -266,10 +336,11 @@ class _GalleryDetail extends StatelessWidget {
                           ),
                           onPressed: () async {
                             final state = context.read<AppState>();
-                            final downloader = context.read<WallpaperDownloader>();
+                            final downloader =
+                                context.read<WallpaperDownloader>();
                             try {
                               final file = await downloader.downloadWallpaper(
-                                wallpaper,
+                                widget.wallpaper,
                                 Directory(state.downloadDir),
                               );
                               if (!context.mounted) return;
@@ -282,9 +353,8 @@ class _GalleryDetail extends StatelessWidget {
                               if (!context.mounted) return;
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(l.searchFailed(
-                                    error.toString(),
-                                  )),
+                                  content:
+                                      Text(l.searchFailed(error.toString())),
                                 ),
                               );
                             }
@@ -293,11 +363,26 @@ class _GalleryDetail extends StatelessWidget {
                           label: Text(l.downloadButton),
                         ),
                       ),
+                      const SizedBox(width: 8),
+                      OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          side: const BorderSide(color: Colors.white24),
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                        ),
+                        onPressed: () {
+                          final url = Uri.parse(widget.wallpaper.pageUrl);
+                          if (url.toString().isNotEmpty) {
+                            launchUrl(url, mode: LaunchMode.externalApplication);
+                          }
+                        },
+                        child: const Icon(Icons.open_in_new, size: 20),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '${wallpaper.resolution} · ${wallpaper.purity} · ${wallpaper.category}',
+                    '${widget.wallpaper.resolution} · ${widget.wallpaper.purity} · ${widget.wallpaper.category}',
                     style: const TextStyle(color: Colors.white54, fontSize: 12),
                     textAlign: TextAlign.center,
                   ),
@@ -310,3 +395,4 @@ class _GalleryDetail extends StatelessWidget {
     );
   }
 }
+

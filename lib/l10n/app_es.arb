@@ -80,6 +80,12 @@
   "startupLabel": "Ejecutar al iniciar el sistema",
   "languageLabel": "Idioma",
   "languageSystem": "Predeterminado del sistema",
+  "trayShow": "Mostrar",
+  "trayExit": "Salir",
+  "tagsLabel": "Etiquetas",
+  "openInBrowser": "Abrir en el navegador",
+  "uploadedBy": "Subido por {name}",
+  "@uploadedBy": { "placeholders": { "name": { "type": "String" } } },
 
   "historySectionTitle": "Historial y descargas",
   "openFolderButton": "Abrir carpeta",

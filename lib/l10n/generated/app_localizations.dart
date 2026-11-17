@@ -518,6 +518,36 @@ abstract class AppLocalizations {
   /// **'System default'**
   String get languageSystem;
 
+  /// No description provided for @trayShow.
+  ///
+  /// In en, this message translates to:
+  /// **'Show'**
+  String get trayShow;
+
+  /// No description provided for @trayExit.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit'**
+  String get trayExit;
+
+  /// No description provided for @tagsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get tagsLabel;
+
+  /// No description provided for @openInBrowser.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in browser'**
+  String get openInBrowser;
+
+  /// No description provided for @uploadedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploaded by {name}'**
+  String uploadedBy(String name);
+
   /// No description provided for @historySectionTitle.
   ///
   /// In en, this message translates to:

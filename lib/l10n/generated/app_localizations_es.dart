@@ -231,6 +231,23 @@ class AppLocalizationsEs extends AppLocalizations {
   String get languageSystem => 'Predeterminado del sistema';
 
   @override
+  String get trayShow => 'Mostrar';
+
+  @override
+  String get trayExit => 'Salir';
+
+  @override
+  String get tagsLabel => 'Etiquetas';
+
+  @override
+  String get openInBrowser => 'Abrir en el navegador';
+
+  @override
+  String uploadedBy(String name) {
+    return 'Subido por $name';
+  }
+
+  @override
   String get historySectionTitle => 'Historial y descargas';
 
   @override

@@ -37,6 +37,8 @@ class Wallpaper {
     required this.favorites,
     required this.colors,
     required this.thumbs,
+    this.uploaderUsername,
+    this.tagNames = const [],
   });
 
   final String id;
@@ -59,12 +61,18 @@ class Wallpaper {
   final List<String> colors;
   final WallpaperThumbs thumbs;
 
+  /// Only present in the detail endpoint (`/w/{id}`).
+  final String? uploaderUsername;
+  final List<String> tagNames;
+
   String get fileExt => fileType == 'image/png' ? 'png' : 'jpg';
   bool get isPortrait => width < height;
 
   factory Wallpaper.fromJson(Map<String, dynamic> json) {
     final thumbsJson =
         json['thumbs'] as Map<String, dynamic>? ?? const {};
+    final uploader = json['uploader'] as Map<String, dynamic>?;
+    final tags = json['tags'] as List<dynamic>? ?? [];
     return Wallpaper(
       id: json['id'] as String? ?? '',
       pageUrl: json['url'] as String? ?? '',
@@ -83,6 +91,11 @@ class Wallpaper {
           .map((c) => c as String)
           .toList(),
       thumbs: WallpaperThumbs.fromJson(thumbsJson),
+      uploaderUsername: uploader?['username'] as String?,
+      tagNames: tags
+          .map((t) => (t as Map<String, dynamic>)['name'] as String? ?? '')
+          .where((n) => n.isNotEmpty)
+          .toList(),
     );
   }
 }

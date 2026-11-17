@@ -80,6 +80,12 @@
   "startupLabel": "Run at system startup",
   "languageLabel": "Language",
   "languageSystem": "System default",
+  "trayShow": "Show",
+  "trayExit": "Exit",
+  "tagsLabel": "Tags",
+  "openInBrowser": "Open in browser",
+  "uploadedBy": "Uploaded by {name}",
+  "@uploadedBy": { "placeholders": { "name": { "type": "String" } } },
 
   "historySectionTitle": "History & downloads",
   "openFolderButton": "Open folder",

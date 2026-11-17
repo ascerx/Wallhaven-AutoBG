@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:window_manager/window_manager.dart';
 
 import 'app.dart';
 import 'services/auto_changer.dart';
@@ -14,6 +15,10 @@ import 'state/app_state.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Window management (hide to tray instead of closing).
+  await windowManager.ensureInitialized();
+  await windowManager.setTitle('Wallhaven Client');
 
   final prefs = await SharedPreferences.getInstance();
 
