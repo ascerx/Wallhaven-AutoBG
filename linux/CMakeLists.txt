@@ -13,6 +13,11 @@ set(APPLICATION_ID "com.example.wallhaven_client")
 # versions of CMake.
 cmake_policy(SET CMP0063 NEW)
 
+# Newer GCC runner images promote plugin warnings (e.g. uninitialized
+# variables inside third-party plugin sources) to build-breaking errors via
+# -Werror. Tolerate warnings so third-party plugin code still compiles.
+add_compile_options("-Wno-error")
+
 # Load bundled libraries from the lib/ directory relative to the binary.
 set(CMAKE_INSTALL_RPATH "$ORIGIN/lib")
 
