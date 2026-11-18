@@ -6,6 +6,8 @@ import 'package:wallhaven_client/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/auto_changer.dart';
+import '../../services/wallpaper/wallpaper_android.dart';
+import '../../services/wallpaper/wallpaper_service.dart';
 import '../../state/app_state.dart';
 import '../widgets/common.dart';
 
@@ -19,6 +21,32 @@ class AutoScreen extends StatefulWidget {
 
 class _AutoScreenState extends State<AutoScreen> {
   Timer? _ticker;
+
+  bool get _isAndroid => Platform.isAndroid;
+
+  /// Android: the rotation runs in the native foreground service, so it
+  /// keeps working with the app closed.
+  Future<void> _startAndroid(BuildContext context) async {
+    final state = context.read<AppState>();
+    final changer = context.read<AutoChanger>();
+    final service = context.read<WallpaperService>();
+    if (service is AndroidWallpaperService) {
+      await service.startBackgroundService(
+        intervalMinutes: state.intervalMinutes,
+        config: state.options.toJson(),
+      );
+    }
+    changer.markExternalRunning();
+  }
+
+  Future<void> _stopAndroid(BuildContext context) async {
+    final changer = context.read<AutoChanger>();
+    final service = context.read<WallpaperService>();
+    if (service is AndroidWallpaperService) {
+      await service.stopBackgroundService();
+    }
+    changer.markExternalStopped();
+  }
 
   @override
   void initState() {
@@ -85,20 +113,34 @@ class _AutoScreenState extends State<AutoScreen> {
                 spacing: 12,
                 runSpacing: 8,
                 children: [
-                  changer.isRunning
-                      ? FilledButton.tonalIcon(
-                          onPressed: changer.stop,
-                          icon: const Icon(Icons.stop),
-                          label: Text(l.stopButton),
-                        )
-                      : FilledButton.icon(
-                          onPressed: () => changer.start(
-                            interval:
-                                Duration(minutes: state.intervalMinutes),
+                  if (_isAndroid)
+                    changer.isRunning
+                        ? FilledButton.tonalIcon(
+                            onPressed: () => _stopAndroid(context),
+                            icon: const Icon(Icons.stop),
+                            label: Text(l.stopButton),
+                          )
+                        : FilledButton.icon(
+                            onPressed: () => _startAndroid(context),
+                            icon: const Icon(Icons.play_arrow),
+                            label: Text(l.startButton),
+                          )
+                  else ...[
+                    changer.isRunning
+                        ? FilledButton.tonalIcon(
+                            onPressed: changer.stop,
+                            icon: const Icon(Icons.stop),
+                            label: Text(l.stopButton),
+                          )
+                        : FilledButton.icon(
+                            onPressed: () => changer.start(
+                              interval:
+                                  Duration(minutes: state.intervalMinutes),
+                            ),
+                            icon: const Icon(Icons.play_arrow),
+                            label: Text(l.startButton),
                           ),
-                          icon: const Icon(Icons.play_arrow),
-                          label: Text(l.startButton),
-                        ),
+                  ],
                   OutlinedButton.icon(
                     onPressed: changer.changeNow,
                     icon: const Icon(Icons.wallpaper),

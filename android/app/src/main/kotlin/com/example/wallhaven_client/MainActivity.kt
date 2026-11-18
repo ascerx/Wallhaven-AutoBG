@@ -1,6 +1,7 @@
 package com.example.wallhaven_client
 
 import android.app.WallpaperManager
+import androidx.core.content.ContextCompat
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -37,6 +38,22 @@ class MainActivity : FlutterActivity() {
                                 }
                             }
                         }.start()
+                    }
+                    "startBackgroundService" -> {
+                        val intent = Intent(this, WallpaperSchedulerService::class.java)
+                        intent.putExtra(
+                            "intervalMinutes",
+                            (call.argument<Number>("intervalMinutes")?.toLong()) ?: 30L,
+                        )
+                        intent.putExtra("config", call.argument<String>("config") ?: "")
+                        ContextCompat.startForegroundService(this, intent)
+                        result.success(true)
+                    }
+                    "stopBackgroundService" -> {
+                        val intent = Intent(this, WallpaperSchedulerService::class.java)
+                        intent.putExtra("action", "stop")
+                        startService(intent)
+                        result.success(true)
                     }
                     else -> result.notImplemented()
                 }

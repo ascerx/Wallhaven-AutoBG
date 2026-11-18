@@ -293,7 +293,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get androidNote =>
-      'Sur Android, le fond d\'écran est appliqué à l\'écran d\'accueil.';
+      'Sur Android, la rotation utilise un service au premier plan : elle continue même quand l\'app est fermée.';
 
   @override
   String get languageLabel => 'Langue';

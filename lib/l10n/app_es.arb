@@ -105,7 +105,7 @@
   "resolutionsLabel": "Resoluciones exactas",
   "allWideChip": "Todas horizontales",
   "allPortraitChip": "Todas verticales",
-  "androidNote": "En Android el fondo se aplica a la pantalla de inicio.",
+  "androidNote": "En Android la rotación usa un servicio en primer plano: sigue funcionando aunque cierres la app.",
   "languageLabel": "Idioma",
   "languageSystem": "Predeterminado del sistema",
   "trayShow": "Mostrar",

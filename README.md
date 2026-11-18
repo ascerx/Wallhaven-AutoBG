@@ -16,7 +16,7 @@ Cross-platform (Flutter) client for [wallhaven.cc](https://wallhaven.cc): search
 | --- | --- | --- |
 | Windows | ✅ `IDesktopWallpaper` COM | Single-exe setup / portable |
 | Linux | ✅ gsettings / plasma / feh | .deb |
-| Android | ✅ `WallpaperManager` (home screen) | APK |
+| Android | ✅ `WallpaperManager` (foreground service — works with the app closed) | APK |
 
 ## Features
 

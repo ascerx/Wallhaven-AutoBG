@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 
 import '../services/auto_changer.dart';
 import '../services/hotkey_service.dart';
+import '../services/wallpaper/wallpaper_android.dart';
+import '../services/wallpaper/wallpaper_service.dart';
 import '../state/app_state.dart';
 import 'screens/auto_screen.dart';
 import 'screens/history_screen.dart';
@@ -46,13 +48,27 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     // Resume the rotation if it was active before the restart. No immediate
     // change: the wallpaper was already applied.
-    if (state.rotationActive && !changer.isRunning) {
+    if (!Platform.isAndroid && state.rotationActive && !changer.isRunning) {
       changer.start(
         interval: Duration(minutes: state.intervalMinutes),
         resume: true,
       );
-    } else if (state.autoStart && !changer.isRunning) {
+    } else if (!Platform.isAndroid &&
+        state.autoStart &&
+        !changer.isRunning) {
       changer.start(interval: Duration(minutes: state.intervalMinutes));
+    }
+    // On Android the rotation runs in the native foreground service; make
+    // sure it is up if it was active before (the OS may have killed it).
+    if (Platform.isAndroid && state.rotationActive) {
+      final service = context.read<WallpaperService>();
+      if (service is AndroidWallpaperService) {
+        service.startBackgroundService(
+          intervalMinutes: state.intervalMinutes,
+          config: state.options.toJson(),
+        );
+      }
+      if (!changer.isRunning) changer.markExternalRunning();
     }
     // Optional global hotkey (desktop only).
     if (state.hotkeyEnabled && !Platform.isAndroid) {

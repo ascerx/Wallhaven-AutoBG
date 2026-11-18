@@ -105,7 +105,7 @@
   "resolutionsLabel": "Exact resolutions",
   "allWideChip": "All wide",
   "allPortraitChip": "All portrait",
-  "androidNote": "On Android the wallpaper is applied to the home screen.",
+  "androidNote": "On Android the rotation runs as a foreground service: it keeps working even with the app closed.",
   "languageLabel": "Language",
   "languageSystem": "System default",
   "trayShow": "Show",

@@ -289,7 +289,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get androidNote =>
-      'On Android the wallpaper is applied to the home screen.';
+      'On Android the rotation runs as a foreground service: it keeps working even with the app closed.';
 
   @override
   String get languageLabel => 'Language';

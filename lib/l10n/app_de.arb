@@ -105,7 +105,7 @@
   "resolutionsLabel": "Exakte Auflösungen",
   "allWideChip": "Alle breiten",
   "allPortraitChip": "Alle hochformatigen",
-  "androidNote": "Auf Android wird das Hintergrundbild auf den Startbildschirm angewendet.",
+  "androidNote": "Auf Android läuft die Rotation als Vordergrunddienst: Sie funktioniert auch, wenn die App geschlossen ist.",
   "languageLabel": "Sprache",
   "languageSystem": "Systemstandard",
   "trayShow": "Anzeigen",

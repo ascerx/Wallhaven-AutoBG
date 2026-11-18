@@ -291,7 +291,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get androidNote =>
-      'No Android o papel de parede é aplicado à tela inicial.';
+      'No Android a rotação usa um serviço em primeiro plano: continua funcionando mesmo com o app fechado.';
 
   @override
   String get languageLabel => 'Idioma';

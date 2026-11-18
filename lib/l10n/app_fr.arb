@@ -105,7 +105,7 @@
   "resolutionsLabel": "Résolutions exactes",
   "allWideChip": "Tous les paysages",
   "allPortraitChip": "Tous les portraits",
-  "androidNote": "Sur Android, le fond d'écran est appliqué à l'écran d'accueil.",
+  "androidNote": "Sur Android, la rotation utilise un service au premier plan : elle continue même quand l'app est fermée.",
   "languageLabel": "Langue",
   "languageSystem": "Langue du système",
   "trayShow": "Afficher",

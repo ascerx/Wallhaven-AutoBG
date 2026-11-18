@@ -623,7 +623,7 @@ abstract class AppLocalizations {
   /// No description provided for @androidNote.
   ///
   /// In en, this message translates to:
-  /// **'On Android the wallpaper is applied to the home screen.'**
+  /// **'On Android the rotation runs as a foreground service: it keeps working even with the app closed.'**
   String get androidNote;
 
   /// No description provided for @languageLabel.

@@ -193,6 +193,23 @@ class AutoChanger extends ChangeNotifier {
   /// Public so the gallery can prune after batch downloads.
   Future<void> pruneDownloads() => _prune();
 
+  /// Marks the rotation as running when it is driven externally (the native
+  /// Android foreground service) instead of by this Dart timer.
+  void markExternalRunning() {
+    _status = AutoChangerStatus.running;
+    _nextChangeAt = null;
+    unawaited(_appState?.setRotationActive(true));
+    notifyListeners();
+  }
+
+  /// Marks the rotation as stopped when an external driver stops it.
+  void markExternalStopped() {
+    _status = AutoChangerStatus.stopped;
+    _nextChangeAt = null;
+    unawaited(_appState?.setRotationActive(false));
+    notifyListeners();
+  }
+
   Future<void> _run() async {
     try {
       final options = _getOptions();

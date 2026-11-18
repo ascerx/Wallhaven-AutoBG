@@ -292,7 +292,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get androidNote =>
-      'Auf Android wird das Hintergrundbild auf den Startbildschirm angewendet.';
+      'Auf Android läuft die Rotation als Vordergrunddienst: Sie funktioniert auch, wenn die App geschlossen ist.';
 
   @override
   String get languageLabel => 'Sprache';

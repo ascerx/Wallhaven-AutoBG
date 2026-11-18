@@ -289,7 +289,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get androidNote =>
-      'En Android el fondo se aplica a la pantalla de inicio.';
+      'En Android la rotación usa un servicio en primer plano: sigue funcionando aunque cierres la app.';
 
   @override
   String get languageLabel => 'Idioma';

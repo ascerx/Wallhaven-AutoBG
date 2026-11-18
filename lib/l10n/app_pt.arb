@@ -105,7 +105,7 @@
   "resolutionsLabel": "Resoluções exatas",
   "allWideChip": "Todas horizontais",
   "allPortraitChip": "Todas verticais",
-  "androidNote": "No Android o papel de parede é aplicado à tela inicial.",
+  "androidNote": "No Android a rotação usa um serviço em primeiro plano: continua funcionando mesmo com o app fechado.",
   "languageLabel": "Idioma",
   "languageSystem": "Padrão do sistema",
   "trayShow": "Mostrar",
