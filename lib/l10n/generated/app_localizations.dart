@@ -542,6 +542,84 @@ abstract class AppLocalizations {
   /// **'Run at system startup'**
   String get startupLabel;
 
+  /// No description provided for @hotkeyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Global hotkey Ctrl+Alt+W: change wallpaper'**
+  String get hotkeyLabel;
+
+  /// No description provided for @sourceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Source'**
+  String get sourceLabel;
+
+  /// No description provided for @sourceSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved search'**
+  String get sourceSearch;
+
+  /// No description provided for @sourceCollection.
+  ///
+  /// In en, this message translates to:
+  /// **'User collection'**
+  String get sourceCollection;
+
+  /// No description provided for @usernameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallhaven username'**
+  String get usernameLabel;
+
+  /// No description provided for @loadCollections.
+  ///
+  /// In en, this message translates to:
+  /// **'Load my collections'**
+  String get loadCollections;
+
+  /// No description provided for @collectionsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Collection'**
+  String get collectionsLabel;
+
+  /// No description provided for @collectionsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No collections found.'**
+  String get collectionsEmpty;
+
+  /// No description provided for @collectionsNeedKey.
+  ///
+  /// In en, this message translates to:
+  /// **'An API key is required to load collections.'**
+  String get collectionsNeedKey;
+
+  /// No description provided for @resolutionsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Exact resolutions'**
+  String get resolutionsLabel;
+
+  /// No description provided for @allWideChip.
+  ///
+  /// In en, this message translates to:
+  /// **'All wide'**
+  String get allWideChip;
+
+  /// No description provided for @allPortraitChip.
+  ///
+  /// In en, this message translates to:
+  /// **'All portrait'**
+  String get allPortraitChip;
+
+  /// No description provided for @androidNote.
+  ///
+  /// In en, this message translates to:
+  /// **'On Android the wallpaper is applied to the home screen.'**
+  String get androidNote;
+
   /// No description provided for @languageLabel.
   ///
   /// In en, this message translates to:

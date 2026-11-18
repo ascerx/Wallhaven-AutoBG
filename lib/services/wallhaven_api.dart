@@ -7,6 +7,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../models/collection.dart';
 import '../models/search_options.dart';
 import '../models/wallpaper.dart';
 
@@ -51,6 +52,8 @@ class WallhavenApi {
       if (options.atleast != null && options.atleast!.isNotEmpty)
         'atleast': options.atleast!,
       if (options.ratios.isNotEmpty) 'ratios': options.ratios.join(','),
+      if (options.resolutions.isNotEmpty)
+        'resolutions': options.resolutions.join(','),
       if (options.sorting == Sorting.toplist &&
           options.topRange != null &&
           options.topRange!.isNotEmpty)
@@ -90,6 +93,46 @@ class WallhavenApi {
     final decoded = jsonDecode(response.body) as Map<String, dynamic>;
     return Wallpaper.fromJson(
       decoded['data'] as Map<String, dynamic>? ?? const {},
+    );
+  }
+
+  /// Lists the authenticated user's collections (requires an API key).
+  Future<List<Collection>> collections() async {
+    final response = await _get(Uri.https(host, '$_basePath/collections'));
+    final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+    final data =
+        (decoded['data'] as List<dynamic>? ?? []).cast<Map<String, dynamic>>();
+    return data.map(Collection.fromJson).toList();
+  }
+
+  /// Wallpapers of a user collection. Only the purity filter applies here.
+  Future<SearchPage> collection(
+    String username,
+    String collectionId, {
+    int page = 1,
+    SearchOptions? purityOptions,
+  }) async {
+    final params = <String, String>{
+      'page': '$page',
+    };
+    if (purityOptions != null) {
+      params['purity'] = purityOptions.purityParam(hasApiKey: hasApiKey);
+    }
+    final uri = Uri.https(
+      host,
+      '$_basePath/collections/$username/$collectionId',
+      params,
+    );
+    final response = await _get(uri);
+    final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+    final data =
+        (decoded['data'] as List<dynamic>? ?? []).cast<Map<String, dynamic>>();
+    final meta =
+        decoded['meta'] as Map<String, dynamic>? ?? const <String, dynamic>{};
+    return SearchPage(
+      wallpapers: data.map(Wallpaper.fromJson).toList(),
+      currentPage: (meta['current_page'] as num?)?.toInt() ?? page,
+      lastPage: (meta['last_page'] as num?)?.toInt() ?? 1,
     );
   }
 

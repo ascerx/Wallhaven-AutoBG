@@ -251,6 +251,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get startupLabel => 'Run at system startup';
 
   @override
+  String get hotkeyLabel => 'Global hotkey Ctrl+Alt+W: change wallpaper';
+
+  @override
+  String get sourceLabel => 'Source';
+
+  @override
+  String get sourceSearch => 'Saved search';
+
+  @override
+  String get sourceCollection => 'User collection';
+
+  @override
+  String get usernameLabel => 'Wallhaven username';
+
+  @override
+  String get loadCollections => 'Load my collections';
+
+  @override
+  String get collectionsLabel => 'Collection';
+
+  @override
+  String get collectionsEmpty => 'No collections found.';
+
+  @override
+  String get collectionsNeedKey =>
+      'An API key is required to load collections.';
+
+  @override
+  String get resolutionsLabel => 'Exact resolutions';
+
+  @override
+  String get allWideChip => 'All wide';
+
+  @override
+  String get allPortraitChip => 'All portrait';
+
+  @override
+  String get androidNote =>
+      'On Android the wallpaper is applied to the home screen.';
+
+  @override
   String get languageLabel => 'Language';
 
   @override

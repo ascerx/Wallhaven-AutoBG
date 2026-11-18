@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:file_selector/file_selector.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:wallhaven_client/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 
+import '../../services/auto_changer.dart';
+import '../../services/hotkey_service.dart';
 import '../../services/startup.dart';
 import '../../services/wallpaper/wallpaper_service.dart';
 import '../../state/app_state.dart';
@@ -20,10 +24,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   late final TextEditingController _apiKey;
   late final TextEditingController _interval;
   late final TextEditingController _folder;
+  late final TextEditingController _username;
   WallpaperFit _fit = WallpaperFit.fill;
   int _maxDownloads = 50;
   String _localeCode = 'system';
   bool _runAtStartup = false;
+  bool _hotkeyEnabled = false;
 
   bool _obscureKey = true;
   final _formKey = GlobalKey<FormState>();
@@ -36,9 +42,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _interval =
         TextEditingController(text: state.intervalMinutes.toString());
     _folder = TextEditingController(text: state.downloadDir);
+    _username = TextEditingController(text: state.wallhavenUser);
     _fit = state.fit;
     _maxDownloads = state.maxDownloads ?? -1;
     _localeCode = state.localeCode;
+    _hotkeyEnabled = state.hotkeyEnabled;
     _loadStartupState();
   }
 
@@ -59,6 +67,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _apiKey.dispose();
     _interval.dispose();
     _folder.dispose();
+    _username.dispose();
     super.dispose();
   }
 
@@ -76,8 +85,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final state = context.read<AppState>();
     await state.setApiKey(_apiKey.text);
     await state.setIntervalMinutes(int.parse(_interval.text.trim()));
-    await state.setFit(_fit);
-    await state.setMaxDownloads(_maxDownloads == -1 ? null : _maxDownloads);
+    await state.setWallhavenUser(_username.text);
+    if (!Platform.isAndroid) {
+      await state.setFit(_fit);
+      await state.setMaxDownloads(_maxDownloads == -1 ? null : _maxDownloads);
+    }
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -149,32 +161,54 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
-                  controller: _folder,
-                  readOnly: true,
+                  controller: _username,
                   decoration: InputDecoration(
-                    labelText: l.downloadFolderLabel,
+                    labelText: l.usernameLabel,
                     border: const OutlineInputBorder(),
-                    suffixIcon: IconButton(
-                      tooltip: l.chooseFolderButton,
-                      icon: const Icon(Icons.folder_open),
-                      onPressed: _chooseFolder,
-                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
-                DropdownButtonFormField<WallpaperFit>(
-                  initialValue: _fit,
-                  decoration: InputDecoration(
-                    labelText: l.fitLabel,
-                    border: const OutlineInputBorder(),
-                  ),
-                  items: [
-                    for (final fit in WallpaperFit.values)
-                      DropdownMenuItem(value: fit, child: Text(fitLabel(fit))),
-                  ],
-                  onChanged: (value) =>
-                      setState(() => _fit = value ?? WallpaperFit.fill),
-                ),
+                ...(!Platform.isAndroid
+                    ? <Widget>[
+                        TextFormField(
+                          controller: _folder,
+                          readOnly: true,
+                          decoration: InputDecoration(
+                            labelText: l.downloadFolderLabel,
+                            border: const OutlineInputBorder(),
+                            suffixIcon: IconButton(
+                              tooltip: l.chooseFolderButton,
+                              icon: const Icon(Icons.folder_open),
+                              onPressed: _chooseFolder,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        DropdownButtonFormField<WallpaperFit>(
+                          initialValue: _fit,
+                          decoration: InputDecoration(
+                            labelText: l.fitLabel,
+                            border: const OutlineInputBorder(),
+                          ),
+                          items: [
+                            for (final fit in WallpaperFit.values)
+                              DropdownMenuItem(
+                                  value: fit, child: Text(fitLabel(fit))),
+                          ],
+                          onChanged: (value) =>
+                              setState(() => _fit = value ?? WallpaperFit.fill),
+                        ),
+                      ]
+                    : <Widget>[
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            const Icon(Icons.info_outline, size: 16),
+                            const SizedBox(width: 6),
+                            Expanded(child: Text(l.androidNote)),
+                          ],
+                        ),
+                      ]),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<int>(
                   initialValue: _maxDownloads,
@@ -224,15 +258,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         .setLocaleCode(_localeCode);
                   },
                 ),
-                const SizedBox(height: 8),
-                CheckboxListTile(
-                  value: _runAtStartup,
-                  onChanged: (value) => _toggleStartup(value ?? false),
-                  controlAffinity: ListTileControlAffinity.leading,
-                  contentPadding: EdgeInsets.zero,
-                  dense: true,
-                  title: Text(l.startupLabel),
-                ),
+                if (!Platform.isAndroid)
+                  ...[
+                    const SizedBox(height: 8),
+                    CheckboxListTile(
+                      value: _runAtStartup,
+                      onChanged: (value) => _toggleStartup(value ?? false),
+                      controlAffinity: ListTileControlAffinity.leading,
+                      contentPadding: EdgeInsets.zero,
+                      dense: true,
+                      title: Text(l.startupLabel),
+                    ),
+                    CheckboxListTile(
+                      value: _hotkeyEnabled,
+                      onChanged: (value) async {
+                        final enabled = value ?? false;
+                        final state = context.read<AppState>();
+                        final changer = context.read<AutoChanger>();
+                        await state.setHotkeyEnabled(enabled);
+                        if (enabled) {
+                          await HotkeyService.register(changer);
+                        } else {
+                          await HotkeyService.unregister();
+                        }
+                        if (mounted) {
+                          setState(() => _hotkeyEnabled = enabled);
+                        }
+                      },
+                      controlAffinity: ListTileControlAffinity.leading,
+                      contentPadding: EdgeInsets.zero,
+                      dense: true,
+                      title: Text(l.hotkeyLabel),
+                    ),
+                  ],
                 const SizedBox(height: 8),
                 Row(
                   children: [

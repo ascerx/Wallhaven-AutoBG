@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:wallhaven_client/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/collection.dart';
 import '../../models/search_options.dart';
 import '../../models/wallpaper.dart';
 import '../../services/wallhaven_api.dart';
@@ -24,16 +25,25 @@ class _SearchConfigScreenState extends State<SearchConfigScreen> {
   // '' means "any".
   String _atleast = '';
   List<String> _ratios = const [];
+  List<String> _resolutions = const [];
   late Sorting _sorting;
   late SortOrder _order;
   String? _topRange;
   String _color = '';
 
+  // Collection-as-source state.
+  bool _useCollection = false;
+  late final TextEditingController _collectionUser;
+  String? _collectionId;
+  String? _collectionLabel;
+  List<Collection>? _collections;
+  bool _loadingCollections = false;
+
   bool _testing = false;
   List<Wallpaper>? _results;
   String? _testError;
 
-  static const List<String> _resolutions = [
+  static const List<String> _minResOptions = [
     '1280x720',
     '1920x1080',
     '2560x1440',
@@ -50,6 +60,14 @@ class _SearchConfigScreenState extends State<SearchConfigScreen> {
     _purity = {...options.purity};
     _atleast = options.atleast ?? '';
     _ratios = List.of(options.ratios);
+    _resolutions = List.of(options.resolutions);
+    _useCollection = options.collectionId != null;
+    _collectionId = options.collectionId;
+    _collectionLabel = options.collectionLabel;
+    _collectionUser = TextEditingController(
+      text: options.collectionUser ??
+          context.read<AppState>().wallhavenUser,
+    );
     _sorting = options.sorting;
     _order = options.order;
     _topRange = options.topRange ?? '1M';
@@ -59,7 +77,44 @@ class _SearchConfigScreenState extends State<SearchConfigScreen> {
   @override
   void dispose() {
     _query.dispose();
+    _collectionUser.dispose();
     super.dispose();
+  }
+
+  void _toggleRatioSet(List<String> set) {
+    setState(() {
+      final all = set.every(_ratios.contains);
+      if (all) {
+        _ratios = _ratios.where((r) => !set.contains(r)).toList();
+      } else {
+        _ratios = {..._ratios, ...set}.toList();
+      }
+    });
+  }
+
+  Future<void> _loadCollections() async {
+    setState(() => _loadingCollections = true);
+    try {
+      final list = await context.read<WallhavenApi>().collections();
+      if (!mounted) return;
+      setState(() {
+        _collections = list;
+        _loadingCollections = false;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _collections = [];
+        _loadingCollections = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.searchFailed(
+            error.toString(),
+          )),
+        ),
+      );
+    }
   }
 
   SearchOptions _buildOptions() => SearchOptions(
@@ -74,6 +129,12 @@ class _SearchConfigScreenState extends State<SearchConfigScreen> {
         purity: _purity.isEmpty ? const {Purity.sfw} : _purity,
         atleast: _atleast.isEmpty ? null : _atleast,
         ratios: _ratios,
+        resolutions: _resolutions,
+        collectionUser: _useCollection && _collectionUser.text.isNotEmpty
+            ? _collectionUser.text.trim()
+            : null,
+        collectionId: _useCollection ? _collectionId : null,
+        collectionLabel: _useCollection ? _collectionLabel : null,
         sorting: _sorting,
         order: _order,
         topRange: _topRange,
@@ -208,6 +269,20 @@ class _SearchConfigScreenState extends State<SearchConfigScreen> {
                 spacing: 8,
                 runSpacing: 4,
                 children: [
+                  FilterChip(
+                    label: Text(l.allWideChip),
+                    selected: SearchOptions.wideRatios
+                        .every(_ratios.contains),
+                    onSelected: (_) =>
+                        _toggleRatioSet(SearchOptions.wideRatios),
+                  ),
+                  FilterChip(
+                    label: Text(l.allPortraitChip),
+                    selected: SearchOptions.portraitRatios
+                        .every(_ratios.contains),
+                    onSelected: (_) =>
+                        _toggleRatioSet(SearchOptions.portraitRatios),
+                  ),
                   for (final ratio in SearchOptions.availableRatios)
                     FilterChip(
                       label: Text(ratio),
@@ -221,6 +296,26 @@ class _SearchConfigScreenState extends State<SearchConfigScreen> {
                 ],
               ),
               const SizedBox(height: 16),
+              FieldLabel(l.resolutionsLabel),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 4,
+                children: [
+                  for (final resolution
+                      in SearchOptions.availableResolutions)
+                    FilterChip(
+                      label: Text(resolution),
+                      selected: _resolutions.contains(resolution),
+                      onSelected: (selected) => setState(() => selected
+                          ? _resolutions = [..._resolutions, resolution]
+                          : _resolutions = _resolutions
+                              .where((r) => r != resolution)
+                              .toList()),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 initialValue: _atleast,
                 decoration: InputDecoration(
@@ -229,7 +324,7 @@ class _SearchConfigScreenState extends State<SearchConfigScreen> {
                 ),
                 items: [
                   DropdownMenuItem(value: '', child: Text(l.noMinRes)),
-                  for (final res in _resolutions)
+                  for (final res in _minResOptions)
                     DropdownMenuItem(value: res, child: Text(res)),
                 ],
                 onChanged: (value) => setState(() => _atleast = value ?? ''),
@@ -320,6 +415,82 @@ class _SearchConfigScreenState extends State<SearchConfigScreen> {
                 ],
                 onChanged: (value) => setState(() => _color = value ?? ''),
               ),
+              const SizedBox(height: 16),
+              FieldLabel(l.sourceLabel),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                initialValue: _useCollection ? 'collection' : 'search',
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                ),
+                items: [
+                  DropdownMenuItem(value: 'search', child: Text(l.sourceSearch)),
+                  DropdownMenuItem(
+                      value: 'collection', child: Text(l.sourceCollection)),
+                ],
+                onChanged: (value) =>
+                    setState(() => _useCollection = value == 'collection'),
+              ),
+              if (_useCollection) ...[
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _collectionUser,
+                  decoration: InputDecoration(
+                    labelText: l.usernameLabel,
+                    border: const OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                if (!context.watch<AppState>().hasApiKey)
+                  Row(
+                    children: [
+                      const Icon(Icons.info_outline, size: 16),
+                      const SizedBox(width: 6),
+                      Expanded(child: Text(l.collectionsNeedKey)),
+                    ],
+                  )
+                else ...[
+                  OutlinedButton.icon(
+                    onPressed: _loadingCollections ? null : _loadCollections,
+                    icon: _loadingCollections
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.sync),
+                    label: Text(l.loadCollections),
+                  ),
+                  if (_collections != null) ...[
+                    const SizedBox(height: 8),
+                    if (_collections!.isEmpty)
+                      Text(l.collectionsEmpty)
+                    else
+                      DropdownButtonFormField<String>(
+                        initialValue: _collectionId,
+                        decoration: InputDecoration(
+                          labelText: l.collectionsLabel,
+                          border: const OutlineInputBorder(),
+                        ),
+                        items: [
+                          for (final collection in _collections!)
+                            DropdownMenuItem(
+                              value: '${collection.id}',
+                              child: Text(
+                                  '${collection.label} (${collection.count})'),
+                            ),
+                        ],
+                        onChanged: (value) => setState(() {
+                          _collectionId = value;
+                          _collectionLabel = _collections!
+                              .where((c) => '${c.id}' == value)
+                              .map((c) => c.label)
+                              .firstOrNull;
+                        }),
+                      ),
+                  ],
+                ],
+              ],
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,

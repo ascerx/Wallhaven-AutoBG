@@ -75,10 +75,11 @@ void main() {
     expect(find.text(l.autoSectionTitle), findsOneWidget);
     expect(find.text(l.startButton), findsOneWidget);
 
-    // Tab 1: search configuration.
+    // Tab 1: search configuration. The source dropdown option shares the
+    // section title text, so expect at least one match.
     await tester.tap(find.byIcon(Icons.manage_search_outlined));
     await tester.pumpAndSettle();
-    expect(find.text(l.searchSectionTitle), findsOneWidget);
+    expect(find.text(l.searchSectionTitle), findsWidgets);
     expect(find.text(l.queryLabel), findsOneWidget);
 
     // Tab 2: history.

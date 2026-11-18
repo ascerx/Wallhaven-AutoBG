@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:material_ui/material_ui.dart';
 import 'package:wallhaven_client/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../services/auto_changer.dart';
+import '../services/hotkey_service.dart';
 import '../state/app_state.dart';
 import 'screens/auto_screen.dart';
 import 'screens/history_screen.dart';
@@ -34,6 +37,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final changer = context.read<AutoChanger>();
     if (state.autoStart && !changer.isRunning) {
       changer.start(interval: Duration(minutes: state.intervalMinutes));
+    }
+    // Optional global hotkey (desktop only).
+    if (state.hotkeyEnabled && !Platform.isAndroid) {
+      HotkeyService.register(changer);
     }
   }
 

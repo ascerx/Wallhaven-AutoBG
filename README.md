@@ -10,16 +10,25 @@ Cross-platform (Flutter) client for [wallhaven.cc](https://wallhaven.cc): search
 | --- | --- |
 | ![Gallery](assets/screenshots/gallery.png) | ![Detail](assets/screenshots/detail.png) |
 
+## Platforms
+
+| Platform | Wallpaper rotation | Install method |
+| --- | --- | --- |
+| Windows | ✅ `IDesktopWallpaper` COM | Single-exe setup / portable |
+| Linux | ✅ gsettings / plasma / feh | .deb |
+| Android | ✅ `WallpaperManager` (home screen) | APK |
+
 ## Features
 
-- 🔄 **Automatic wallpaper rotation** every N minutes, with countdown and a "Change now" button.
-- 🔍 **Saved search** with the full API filters: query (supports `+tag -tag @user`), categories, content rating, minimum resolution, **aspect ratios** (16x9, 4x3, ...), sorting and dominant color.
-- 🖼️ **Infinite-scroll gallery** to browse every result, with a detail view (zoom), set as wallpaper or download.
+- 🔄 **Automatic wallpaper rotation** every N minutes, with countdown and a "Change now" button (also a global hotkey: Ctrl+Alt+W).
+- 🔍 **Saved search** with the full API filters: query (supports `+tag -tag @user`), categories, content rating, minimum resolution, **aspect ratios** (16x9, 4x3, all-wide/all-portrait...), **exact resolutions**, sorting and dominant color.
+- 📚 **User collections as a rotation source** (requires API key).
+- 🖼️ **Infinite-scroll gallery** to browse every result, with a detail view (zoom, tags, uploader, open in browser), set as wallpaper, download.
 - 📦 **Batch downloads** from the gallery (selection mode with live progress).
 - 🧹 **Auto-cleanup**: keeps only the latest N downloads (configurable) so your disk never fills up.
 - 📜 **History** of every applied wallpaper with one-click re-apply and **disk usage stats**.
 - 🔑 **Optional API key** to unlock NSFW content.
-- 🚀 **Run at system startup** (optional), minimized to the system tray.
+- 🚀 **Run at system startup** (optional), minimized to the system tray. Closes to the tray so the rotation keeps running.
 - 🌍 i18n ready: Spanish and English included.
 
 ## Installation
@@ -35,6 +44,9 @@ The portable (`...windows-portable.zip`) is also available if you prefer not to 
 
 ### Ubuntu/Debian
 `wallhaven-autobg_<version>_amd64.deb` — `sudo dpkg -i wallhaven-autobg_*_amd64.deb` (installs to `/opt/wallhaven-client` with an applications-menu entry).
+
+### Android
+Download `wallhaven-autobg_<version>_android.apk` from Releases and install it (allow "install unknown apps" when prompted). The wallpaper is applied to the home screen.
 
 ## Building from source
 
@@ -66,12 +78,12 @@ Follow the progress in [Issues](../../issues):
 - [x] System tray (minimize to tray, start hidden) — #3, done in v0.4.1
 - [x] Batch downloads from the gallery — #5, done in v0.4.0
 - [x] Download stats & history cleanup — #9, done in v0.4.0
-- [ ] Android: native wallpaper plugin (`WallpaperManager`) — #1
-- [ ] User collections as rotation source — #2
-- [ ] Extra filters: exact resolutions and all-wide/all-portrait — #4
+- [x] Android support (native `WallpaperManager` plugin) — #1, done in v0.6.0
+- [x] User collections as rotation source — #2, done in v0.6.0
+- [x] Extra filters: exact resolutions and all-wide/all-portrait — #4, done in v0.6.0
+- [x] Global hotkey for "Change now" — #8, done in v0.6.0
 - [ ] MSIX (Windows) / Flatpak-Snap (Linux) installers — #6
 - [ ] More translations (Portuguese, French, German...) — #7
-- [ ] Global hotkey for "Change now" — #8
 
 ## Troubleshooting (Windows)
 

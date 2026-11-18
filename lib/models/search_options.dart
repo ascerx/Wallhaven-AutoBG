@@ -21,6 +21,10 @@ class SearchOptions {
     this.purity = const {Purity.sfw, Purity.sketchy},
     this.atleast,
     this.ratios = const [],
+    this.resolutions = const [],
+    this.collectionUser,
+    this.collectionId,
+    this.collectionLabel,
     this.sorting = Sorting.random,
     this.order = SortOrder.desc,
     this.topRange = '1M',
@@ -45,6 +49,15 @@ class SearchOptions {
   /// any ratio. Multiple entries are passed as a comma-separated list.
   final List<String> ratios;
 
+  /// Exact resolution filters (e.g. `1920x1080`). Empty means any.
+  final List<String> resolutions;
+
+  /// When both are set, the rotation pulls wallpapers from this user
+  /// collection instead of running a normal search.
+  final String? collectionUser;
+  final String? collectionId;
+  final String? collectionLabel;
+
   final Sorting sorting;
   final SortOrder order;
 
@@ -57,6 +70,19 @@ class SearchOptions {
   static const List<String> availableRatios = [
     '16x9', '16x10', '21x9', '32x9', '48x9', '3x2',
     '4x3', '5x4', '9x16', '10x16', '9x18', '1x1',
+  ];
+
+  static const List<String> wideRatios = [
+    '16x9', '16x10', '3x2', '21x9', '32x9', '48x9',
+  ];
+
+  static const List<String> portraitRatios = [
+    '9x16', '10x16', '9x18',
+  ];
+
+  static const List<String> availableResolutions = [
+    '1280x720', '1600x900', '1920x1080', '1920x1200',
+    '2560x1440', '2560x1600', '3440x1440', '3840x2160',
   ];
 
   static const List<String> availableColors = [
@@ -94,6 +120,10 @@ class SearchOptions {
         'purity': purity.map((p) => p.name).toList(),
         'atleast': atleast,
         'ratios': ratios.toList(),
+        'resolutions': resolutions.toList(),
+        'collectionUser': collectionUser,
+        'collectionId': collectionId,
+        'collectionLabel': collectionLabel,
         'sorting': sorting.name,
         'order': order.name,
         'topRange': topRange,
@@ -121,6 +151,12 @@ class SearchOptions {
       ratios: (json['ratios'] as List<dynamic>? ?? [])
           .map((e) => e as String)
           .toList(),
+      resolutions: (json['resolutions'] as List<dynamic>? ?? [])
+          .map((e) => e as String)
+          .toList(),
+      collectionUser: json['collectionUser'] as String?,
+      collectionId: json['collectionId'] as String?,
+      collectionLabel: json['collectionLabel'] as String?,
       sorting: Sorting.values.firstWhere(
         (v) => v.name == json['sorting'],
         orElse: () => Sorting.random,

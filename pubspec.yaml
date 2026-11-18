@@ -2,7 +2,7 @@ name: wallhaven_client
 description: A cross-platform Wallhaven client - search wallpapers, download them
   locally and rotate your desktop background automatically.
 publish_to: none
-version: 0.5.0
+version: 0.6.0
 
 environment:
   sdk: ^3.6.0
@@ -35,6 +35,9 @@ dependencies:
 
   # Open wallpaper page in the browser
   url_launcher: ^6.3.0
+
+  # Global hotkey (Ctrl+Alt+W)
+  hotkey_manager: ^0.2.0
 
   # Used by the Windows wallpaper setter (dart:ffi helpers)
   ffi: ^2.1.3

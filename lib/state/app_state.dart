@@ -27,6 +27,8 @@ class AppState extends ChangeNotifier {
   bool _autoStart = false;
   int? _maxDownloads = 50;
   String _localeCode = 'system';
+  String _wallhavenUser = '';
+  bool _hotkeyEnabled = false;
 
   SearchOptions get options => _options;
   int get intervalMinutes => _intervalMinutes;
@@ -41,6 +43,12 @@ class AppState extends ChangeNotifier {
 
   /// App language override: 'system' | 'en' | 'es'.
   String get localeCode => _localeCode;
+
+  /// The user's wallhaven username (needed to fetch own collections).
+  String get wallhavenUser => _wallhavenUser;
+
+  /// Whether the global hotkey Ctrl+Alt+W is active.
+  bool get hotkeyEnabled => _hotkeyEnabled;
 
   Future<void> load() async {
     final raw = _prefs.getString(_storageKey);
@@ -60,6 +68,8 @@ class AppState extends ChangeNotifier {
         _autoStart = map['autoStart'] as bool? ?? false;
         _maxDownloads = (map['maxDownloads'] as num?)?.toInt() ?? 50;
         _localeCode = map['localeCode'] as String? ?? 'system';
+        _wallhavenUser = map['wallhavenUser'] as String? ?? '';
+        _hotkeyEnabled = map['hotkeyEnabled'] as bool? ?? false;
       } on FormatException {
         // Corrupted settings: fall back to defaults.
       }
@@ -120,6 +130,18 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> setWallhavenUser(String user) async {
+    _wallhavenUser = user.trim();
+    await _persist();
+    notifyListeners();
+  }
+
+  Future<void> setHotkeyEnabled(bool value) async {
+    _hotkeyEnabled = value;
+    await _persist();
+    notifyListeners();
+  }
+
   Future<void> _persist() async {
     await _prefs.setString(_storageKey, jsonEncode({
       'options': _options.toJson(),
@@ -130,6 +152,8 @@ class AppState extends ChangeNotifier {
       'autoStart': _autoStart,
       'maxDownloads': _maxDownloads,
       'localeCode': _localeCode,
+      'wallhavenUser': _wallhavenUser,
+      'hotkeyEnabled': _hotkeyEnabled,
     }));
   }
 }

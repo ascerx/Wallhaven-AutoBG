@@ -181,7 +181,25 @@ class AutoChanger extends ChangeNotifier {
       final options = _getOptions();
 
       SearchPage page;
-      if (options.sorting == Sorting.random) {
+      if (options.collectionUser != null &&
+          options.collectionId != null) {
+        // User collection as the rotation source.
+        final first = await _api.collection(
+          options.collectionUser!,
+          options.collectionId!,
+          purityOptions: options,
+        );
+        final lastPage = first.lastPage.clamp(1, 10).toInt();
+        final target = lastPage > 1 ? _rng.nextInt(lastPage) + 1 : 1;
+        page = target == 1
+            ? first
+            : await _api.collection(
+                options.collectionUser!,
+                options.collectionId!,
+                page: target,
+                purityOptions: options,
+              );
+      } else if (options.sorting == Sorting.random) {
         page = await _api.search(options, seed: _randomSeed());
       } else {
         // Look ahead a few pages so the rotation does not always show the

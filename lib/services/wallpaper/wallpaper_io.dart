@@ -5,6 +5,7 @@ import 'dart:io';
 // library, so the import must stay.
 // ignore: unnecessary_import
 import 'wallpaper_unsupported.dart';
+import 'wallpaper_android.dart';
 import 'wallpaper_linux.dart';
 import 'wallpaper_service.dart';
 import 'wallpaper_windows.dart';
@@ -13,5 +14,7 @@ import 'wallpaper_windows.dart';
 WallpaperService createWallpaperService() {
   if (Platform.isWindows) return WindowsWallpaperService();
   if (Platform.isLinux) return LinuxWallpaperService();
+  if (Platform.isAndroid) return AndroidWallpaperService();
   return UnsupportedWallpaperService(Platform.operatingSystem);
 }
+

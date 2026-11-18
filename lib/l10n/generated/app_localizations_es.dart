@@ -251,6 +251,47 @@ class AppLocalizationsEs extends AppLocalizations {
   String get startupLabel => 'Ejecutar al iniciar el sistema';
 
   @override
+  String get hotkeyLabel => 'Atajo global Ctrl+Alt+W: cambiar fondo';
+
+  @override
+  String get sourceLabel => 'Fuente';
+
+  @override
+  String get sourceSearch => 'Búsqueda guardada';
+
+  @override
+  String get sourceCollection => 'Colección de usuario';
+
+  @override
+  String get usernameLabel => 'Usuario de wallhaven';
+
+  @override
+  String get loadCollections => 'Cargar mis colecciones';
+
+  @override
+  String get collectionsLabel => 'Colección';
+
+  @override
+  String get collectionsEmpty => 'No se encontraron colecciones.';
+
+  @override
+  String get collectionsNeedKey =>
+      'Se necesita una API key para cargar colecciones.';
+
+  @override
+  String get resolutionsLabel => 'Resoluciones exactas';
+
+  @override
+  String get allWideChip => 'Todas horizontales';
+
+  @override
+  String get allPortraitChip => 'Todas verticales';
+
+  @override
+  String get androidNote =>
+      'En Android el fondo se aplica a la pantalla de inicio.';
+
+  @override
   String get languageLabel => 'Idioma';
 
   @override
