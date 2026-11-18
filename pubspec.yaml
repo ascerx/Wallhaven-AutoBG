@@ -40,7 +40,7 @@ dependencies:
   hotkey_manager: ^0.2.0
 
   # AdMob ads (Android)
-  google_mobile_ads: ^5.3.1
+  google_mobile_ads: ^9.2.0
 
   # Used by the Windows wallpaper setter (dart:ffi helpers)
   ffi: ^2.1.3
