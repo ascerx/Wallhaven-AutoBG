@@ -1,7 +1,5 @@
 import 'dart:io';
 
-import 'dart:io';
-
 import 'package:material_ui/material_ui.dart';
 import 'package:wallhaven_client/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
