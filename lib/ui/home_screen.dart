@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'dart:io';
+
 import 'package:material_ui/material_ui.dart';
 import 'package:wallhaven_client/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -35,7 +37,19 @@ class _HomeScreenState extends State<HomeScreen> {
     // Optional auto-start when the app opens.
     final state = context.read<AppState>();
     final changer = context.read<AutoChanger>();
-    if (state.autoStart && !changer.isRunning) {
+    // Restore the last applied wallpaper after a process restart (some
+    // Android environments recreate the activity on wallpaper changes).
+    if (changer.currentPath == null && state.lastAppliedPath.isNotEmpty) {
+      final file = File(state.lastAppliedPath);
+      if (file.existsSync()) {
+        changer.currentPath = state.lastAppliedPath;
+        changer.currentId = state.lastAppliedId;
+      }
+    }
+    // Resume the rotation if it was active before the restart.
+    if (state.rotationActive && !changer.isRunning) {
+      changer.start(interval: Duration(minutes: state.intervalMinutes));
+    } else if (state.autoStart && !changer.isRunning) {
       changer.start(interval: Duration(minutes: state.intervalMinutes));
     }
     // Optional global hotkey (desktop only).

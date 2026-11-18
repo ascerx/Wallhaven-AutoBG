@@ -12,6 +12,7 @@ import 'package:flutter/foundation.dart';
 import '../models/history_entry.dart';
 import '../models/search_options.dart';
 import '../models/wallpaper.dart';
+import '../state/app_state.dart';
 import 'cleanup.dart';
 import 'downloader.dart';
 import 'history_repository.dart';
@@ -30,6 +31,7 @@ class AutoChanger extends ChangeNotifier {
     required String Function() getDownloadDir,
     required WallpaperFit Function() getFit,
     required int? Function() getMaxDownloads,
+    AppState? appState,
   })  : _api = api,
         _downloader = downloader,
         _wallpaper = wallpaper,
@@ -37,7 +39,8 @@ class AutoChanger extends ChangeNotifier {
         _getOptions = getOptions,
         _getDownloadDir = getDownloadDir,
         _getFit = getFit,
-        _getMaxDownloads = getMaxDownloads;
+        _getMaxDownloads = getMaxDownloads,
+        _appState = appState;
 
   final WallhavenApi _api;
   final WallpaperDownloader _downloader;
@@ -47,6 +50,7 @@ class AutoChanger extends ChangeNotifier {
   final String Function() _getDownloadDir;
   final WallpaperFit Function() _getFit;
   final int? Function() _getMaxDownloads;
+  final AppState? _appState;
 
   final Random _rng = Random();
   final List<String> _recentIds = [];
@@ -74,6 +78,7 @@ class AutoChanger extends ChangeNotifier {
     _interval = interval;
     if (isRunning) return;
     _status = AutoChangerStatus.running;
+    unawaited(_appState?.setRotationActive(true));
     _timer = Timer.periodic(_interval, (_) => _run());
     notifyListeners();
     changeNow();
@@ -84,6 +89,7 @@ class AutoChanger extends ChangeNotifier {
     _timer = null;
     _status = AutoChangerStatus.stopped;
     _nextChangeAt = null;
+    unawaited(_appState?.setRotationActive(false));
     notifyListeners();
   }
 
@@ -156,6 +162,7 @@ class AutoChanger extends ChangeNotifier {
         filePath: file.path,
         appliedAt: DateTime.now(),
       ));
+      await _appState?.recordApplied(file.path, wallpaper.id);
       await _prune();
       return true;
     } catch (error) {

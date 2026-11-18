@@ -58,6 +58,7 @@ Future<void> main() async {
     getDownloadDir: () => state.downloadDir,
     getFit: () => state.fit,
     getMaxDownloads: () => state.maxDownloads,
+    appState: state,
   );
 
   runApp(

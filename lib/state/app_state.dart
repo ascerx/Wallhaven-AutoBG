@@ -29,6 +29,9 @@ class AppState extends ChangeNotifier {
   String _localeCode = 'system';
   String _wallhavenUser = '';
   bool _hotkeyEnabled = false;
+  String _lastAppliedPath = '';
+  String _lastAppliedId = '';
+  bool _rotationActive = false;
 
   SearchOptions get options => _options;
   int get intervalMinutes => _intervalMinutes;
@@ -50,6 +53,13 @@ class AppState extends ChangeNotifier {
   /// Whether the global hotkey Ctrl+Alt+W is active.
   bool get hotkeyEnabled => _hotkeyEnabled;
 
+  /// Last wallpaper successfully applied (restored after process restarts —
+  /// some Android environments recreate the activity when the wallpaper
+  /// changes).
+  String get lastAppliedPath => _lastAppliedPath;
+  String get lastAppliedId => _lastAppliedId;
+  bool get rotationActive => _rotationActive;
+
   Future<void> load() async {
     final raw = _prefs.getString(_storageKey);
     if (raw != null) {
@@ -70,6 +80,9 @@ class AppState extends ChangeNotifier {
         _localeCode = map['localeCode'] as String? ?? 'system';
         _wallhavenUser = map['wallhavenUser'] as String? ?? '';
         _hotkeyEnabled = map['hotkeyEnabled'] as bool? ?? false;
+        _lastAppliedPath = map['lastAppliedPath'] as String? ?? '';
+        _lastAppliedId = map['lastAppliedId'] as String? ?? '';
+        _rotationActive = map['rotationActive'] as bool? ?? false;
       } on FormatException {
         // Corrupted settings: fall back to defaults.
       }
@@ -142,6 +155,19 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> recordApplied(String path, String id) async {
+    _lastAppliedPath = path;
+    _lastAppliedId = id;
+    await _persist();
+    notifyListeners();
+  }
+
+  Future<void> setRotationActive(bool value) async {
+    _rotationActive = value;
+    await _persist();
+    notifyListeners();
+  }
+
   Future<void> _persist() async {
     await _prefs.setString(_storageKey, jsonEncode({
       'options': _options.toJson(),
@@ -154,6 +180,9 @@ class AppState extends ChangeNotifier {
       'localeCode': _localeCode,
       'wallhavenUser': _wallhavenUser,
       'hotkeyEnabled': _hotkeyEnabled,
+      'lastAppliedPath': _lastAppliedPath,
+      'lastAppliedId': _lastAppliedId,
+      'rotationActive': _rotationActive,
     }));
   }
 }
