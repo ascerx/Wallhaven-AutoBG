@@ -44,9 +44,13 @@ class _HomeScreenState extends State<HomeScreen> {
         changer.currentId = state.lastAppliedId;
       }
     }
-    // Resume the rotation if it was active before the restart.
+    // Resume the rotation if it was active before the restart. No immediate
+    // change: the wallpaper was already applied.
     if (state.rotationActive && !changer.isRunning) {
-      changer.start(interval: Duration(minutes: state.intervalMinutes));
+      changer.start(
+        interval: Duration(minutes: state.intervalMinutes),
+        resume: true,
+      );
     } else if (state.autoStart && !changer.isRunning) {
       changer.start(interval: Duration(minutes: state.intervalMinutes));
     }

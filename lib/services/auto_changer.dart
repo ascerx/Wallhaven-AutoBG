@@ -74,14 +74,24 @@ class AutoChanger extends ChangeNotifier {
   DateTime? get nextChangeAt => _nextChangeAt;
 
   /// Starts the rotation, applying one wallpaper right away.
-  void start({Duration interval = const Duration(minutes: 30)}) {
+  ///
+  /// When [resume] is true (activity recreation / process restart) the
+  /// timer is rearmed WITHOUT an immediate change: the wallpaper was
+  /// already applied before the restart, and applying again would trigger
+  /// another environment recreation (seen on Android emulators).
+  void start({
+    Duration interval = const Duration(minutes: 30),
+    bool resume = false,
+  }) {
     _interval = interval;
     if (isRunning) return;
     _status = AutoChangerStatus.running;
     unawaited(_appState?.setRotationActive(true));
     _timer = Timer.periodic(_interval, (_) => _run());
     notifyListeners();
-    changeNow();
+    if (!resume) {
+      changeNow();
+    }
   }
 
   void stop() {
