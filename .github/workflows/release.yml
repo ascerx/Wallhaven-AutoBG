@@ -4,11 +4,34 @@ on:
   push:
     tags: ['v*']
   workflow_dispatch:
+    inputs:
+      generate_keystore:
+        description: 'Generate a new Android upload keystore (first-time setup for Play Store)'
+        required: false
+        default: 'false'
 
 permissions:
   contents: write
 
 jobs:
+  generate-keystore:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.generate_keystore == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Android upload keystore
+        run: |
+          keytool -genkeypair -v \
+            -keystore wallhaven-upload.jks \
+            -alias wallhaven \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" \
+            -keypass "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" \
+            -dname "CN=Wallhaven AutoBG, OU=ascerx, O=ascerx, C=ES"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-upload-keystore
+          path: wallhaven-upload.jks
+
   build-windows:
     runs-on: windows-latest
     steps:
@@ -78,21 +101,42 @@ jobs:
       - name: Accept Android SDK licenses
         shell: bash
         run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null 2>&1 || true
+      - name: Prepare Android signing (optional - needs ANDROID_KEYSTORE_BASE64 + ANDROID_KEYSTORE_PASSWORD secrets)
+        if: env.ANDROID_KEYSTORE != ''
+        shell: bash
+        env:
+          ANDROID_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          echo "${ANDROID_KEYSTORE}" | base64 -d > android/app/wallhaven-upload.jks
+          cat > android/key.properties <<EOF
+          storeFile=wallhaven-upload.jks
+          storePassword=${ANDROID_KEYSTORE_PASSWORD}
+          keyAlias=wallhaven
+          keyPassword=${ANDROID_KEYSTORE_PASSWORD}
+          EOF
       - run: flutter pub get
       - run: flutter build apk --release
-      - name: Rename APK
+      - name: Build Android App Bundle (Play Store)
+        run: flutter build appbundle --release
+      - name: Rename APK and AAB
         run: |
           VER=$(grep '^version:' pubspec.yaml | sed 's/version: //;s/+.*//')
           cp build/app/outputs/flutter-apk/app-release.apk wallhaven-autobg_${VER}_android.apk
+          cp build/app/outputs/bundle/release/app-release.aab wallhaven-autobg_${VER}_android.aab
       - uses: actions/upload-artifact@v4
         with:
           name: android-apk
-          path: wallhaven-autobg_*_android.apk
+          path: |
+            wallhaven-autobg_*_android.apk
+            wallhaven-autobg_*_android.aab
       - name: Attach to release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: wallhaven-autobg_*_android.apk
+          files: |
+            wallhaven-autobg_*_android.apk
+            wallhaven-autobg_*_android.aab
 
   build-linux:
     runs-on: ubuntu-latest

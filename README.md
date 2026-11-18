@@ -46,7 +46,13 @@ The portable (`...windows-portable.zip`) is also available if you prefer not to 
 `wallhaven-autobg_<version>_amd64.deb` — `sudo dpkg -i wallhaven-autobg_*_amd64.deb` (installs to `/opt/wallhaven-client` with an applications-menu entry).
 
 ### Android
-Download `wallhaven-autobg_<version>_android.apk` from Releases and install it (allow "install unknown apps" when prompted). The wallpaper is applied to the home screen.
+Two options:
+- **Play Store** (recommended): follow [`docs/PLAY_STORE_CHECKLIST.md`](docs/PLAY_STORE_CHECKLIST.md) and install from your listing.
+- **Direct APK**: download `wallhaven-autobg_<version>_android.apk` from Releases and install it (allow "install unknown apps" when prompted).
+
+Android notes:
+- The rotation runs as a **foreground service** — it keeps working with the app closed (persistent notification).
+- Ads (AdMob) are shown on Android; they hide automatically while NSFW content is unlocked (policy compliance). Test IDs are used until real AdMob IDs are configured (see `lib/config/ads.dart`).
 
 ## Building from source
 
@@ -83,6 +89,8 @@ Follow the progress in [Issues](../../issues):
 - [x] Extra filters: exact resolutions and all-wide/all-portrait — #4, done in v0.6.0
 - [x] Global hotkey for "Change now" — #8, done in v0.6.0
 - [x] More translations (Portuguese, French, German) — #7, done in v0.7.0
+- [ ] Code-sign the Windows installer (free via SignPath Foundation for OSS) — #10, signing support already in the workflow (needs secrets)
+- [ ] Publish on Google Play — see `docs/PLAY_STORE_CHECKLIST.md` (AdMob + keystore support in v0.9.0)
 
 Closed without implementing: #6 (MSIX/Flatpak installers) — the single-exe setup covers Windows and the .deb covers Linux.
 

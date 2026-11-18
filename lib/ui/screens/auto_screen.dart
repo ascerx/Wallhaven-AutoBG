@@ -5,10 +5,12 @@ import 'package:material_ui/material_ui.dart';
 import 'package:wallhaven_client/l10n/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/search_options.dart';
 import '../../services/auto_changer.dart';
 import '../../services/wallpaper/wallpaper_android.dart';
 import '../../services/wallpaper/wallpaper_service.dart';
 import '../../state/app_state.dart';
+import '../widgets/ad_banner.dart';
 import '../widgets/common.dart';
 
 /// Main screen: start/stop the wallpaper rotation and see what is applied.
@@ -211,6 +213,10 @@ class _AutoScreenState extends State<AutoScreen> {
             ),
           ),
         const SizedBox(height: 16),
+        if (Platform.isAndroid) ...[
+          // Hidden while NSFW content can be displayed (AdMob policy).
+          AdBanner(nsfwActive: state.options.purity.contains(Purity.nsfw)),
+        ],
       ],
     );
   }

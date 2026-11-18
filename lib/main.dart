@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:material_ui/material_ui.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart' hide AppState;
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -35,6 +38,15 @@ Future<void> main() async {
     );
   } on Exception {
     // Run as a plain window without window_manager.
+  }
+
+  // AdMob (Android only).
+  if (Platform.isAndroid) {
+    try {
+      await MobileAds.instance.initialize();
+    } on Exception {
+      // Ads unavailable: the app works without them.
+    }
   }
 
   final prefs = await SharedPreferences.getInstance();
