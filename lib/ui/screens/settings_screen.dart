@@ -250,6 +250,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       value: 'en',
                       child: Text('English'),
                     ),
+                    const DropdownMenuItem(
+                      value: 'pt',
+                      child: Text('Português'),
+                    ),
+                    const DropdownMenuItem(
+                      value: 'fr',
+                      child: Text('Français'),
+                    ),
+                    const DropdownMenuItem(
+                      value: 'de',
+                      child: Text('Deutsch'),
+                    ),
                   ],
                   onChanged: (value) async {
                     setState(() => _localeCode = value ?? 'system');

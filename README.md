@@ -29,7 +29,7 @@ Cross-platform (Flutter) client for [wallhaven.cc](https://wallhaven.cc): search
 - 📜 **History** of every applied wallpaper with one-click re-apply and **disk usage stats**.
 - 🔑 **Optional API key** to unlock NSFW content.
 - 🚀 **Run at system startup** (optional), minimized to the system tray. Closes to the tray so the rotation keeps running.
-- 🌍 i18n ready: Spanish and English included.
+- 🌍 **Six languages** included: Spanish, English, Portuguese, French and German (switchable in Settings).
 
 ## Installation
 
@@ -82,8 +82,9 @@ Follow the progress in [Issues](../../issues):
 - [x] User collections as rotation source — #2, done in v0.6.0
 - [x] Extra filters: exact resolutions and all-wide/all-portrait — #4, done in v0.6.0
 - [x] Global hotkey for "Change now" — #8, done in v0.6.0
-- [ ] MSIX (Windows) / Flatpak-Snap (Linux) installers — #6
-- [ ] More translations (Portuguese, French, German...) — #7
+- [x] More translations (Portuguese, French, German) — #7, done in v0.7.0
+
+Closed without implementing: #6 (MSIX/Flatpak installers) — the single-exe setup covers Windows and the .deb covers Linux.
 
 ## Troubleshooting (Windows)
 
